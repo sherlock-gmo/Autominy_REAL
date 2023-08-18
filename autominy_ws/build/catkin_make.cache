@@ -1,0 +1,2 @@
+autominy_msgs:bno055_usb_stick_msgs:darknet_ros_msgs:dotmex2022:dotmex2023:dotmex_final:gps_vis:tmr2023
+-DCATKIN_DEVEL_PREFIX=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel -DCMAKE_INSTALL_PREFIX=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install -G Unix Makefiles

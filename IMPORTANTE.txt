@@ -1,0 +1,14 @@
+Si se usa la versión 10.1 de CUDA, compilar el workspace con:
+$ catkin_make -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-8
+$ catkin_make
+
+En el autominy compilar con:
+$ catkin_make --only-pkg-with-deps dotmex2022 gps_vis autominy_msgs
+
+*Respecto al paquete darnet_ros:
+Solo hace falta descargar los pesos y pegarlos en la carpeta: /darknet_ros/yolo_network_config/weights/ 
+En el archivo how_to_download_weights.txt se muestra dónde descargarlos.
+
+*Además de los paquetes darknet_ros y darnet_ros_msgs; se debe descargar y añadir el paquete darknet de la ruta:
+https://drive.google.com/drive/folders/1pQmu2qkYOtfQTFQm8w2CbHrLzn6c9MBq?usp=sharing
+

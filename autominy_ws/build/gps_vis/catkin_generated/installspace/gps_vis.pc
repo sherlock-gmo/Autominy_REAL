@@ -1,0 +1,8 @@
+prefix=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install
+
+Name: gps_vis
+Description: Description of gps_vis
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,6 @@
+/opt/autominy/catkin_ws/src/autominy/launch/Core_O.launch
+/opt/autominy/catkin_ws/src/autominy/launch/dotmex_2021.launch
+/opt/autominy/catkin_ws/src/autominy/launch/sensors/Sensors_O.launch
+/home/ros/.autostart.sh
+/home/ros/.ros-config.sh
+

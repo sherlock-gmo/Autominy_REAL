@@ -1,0 +1,8 @@
+prefix=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel
+
+Name: darknet_ros_msgs
+Description: Description of darknet_ros_msgs
+Version: 1.1.5
+Cflags: -I/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: actionlib_msgs geometry_msgs sensor_msgs message_runtime std_msgs

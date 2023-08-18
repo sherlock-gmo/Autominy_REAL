@@ -1,0 +1,14 @@
+
+- Tener el paquete "autominy_msgs" en el workspace
+- Compilar con catkin_make
+- De la carpeta ~/Arduino/libraries/ros_lib extraer los archivos:
+	ArduinoHardware.h
+	ArduinoTcpHardware.h
+	ros.h
+- Borrar la carpeta de librerias de arduino con: 
+	rm -r ~/Arduino/libraries/ros_lib
+- Ejecutar: 
+	rosrun rosserial_client make_libraries ~/Arduino/libraries
+- Devolver los archivos *.h a ros_lib
+- Cargar el programa con el ide de arduino
+

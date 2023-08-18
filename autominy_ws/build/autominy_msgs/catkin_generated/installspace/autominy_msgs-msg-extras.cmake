@@ -1,0 +1,2 @@
+set(autominy_msgs_MESSAGE_FILES "msg/NormalizedSpeedCommand.msg;msg/NormalizedSteeringCommand.msg;msg/Plot.msg;msg/SteeringAngle.msg;msg/Speed.msg;msg/SpeedCommand.msg;msg/SpeedPWMCommand.msg;msg/SteeringAngle.msg;msg/SteeringCommand.msg;msg/SteeringPWMCommand.msg;msg/SteeringFeedback.msg;msg/Tick.msg;msg/Trajectory.msg;msg/TrajectoryPoint.msg;msg/Obstacle.msg;msg/Obstacles.msg;msg/Voltage.msg")
+set(autominy_msgs_SERVICE_FILES "")

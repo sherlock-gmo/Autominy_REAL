@@ -1,0 +1,8 @@
+prefix=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel
+
+Name: autominy_msgs
+Description: Description of autominy_msgs
+Version: 0.0.1
+Cflags: -I/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs message_runtime

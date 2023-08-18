@@ -1,0 +1,8 @@
+prefix=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel
+
+Name: dotmex2022
+Description: Description of dotmex2022
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
