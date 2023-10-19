@@ -1,8 +1,0 @@
-prefix=/home/sherlock2004/Autominy_REAL/autominy_ws/devel
-
-Name: bno055_usb_stick_msgs
-Description: Description of bno055_usb_stick_msgs
-Version: 0.0.0
-Cflags: -I/home/sherlock2004/Autominy_REAL/autominy_ws/devel/include
-Libs: -L${prefix}/lib 
-Requires: geometry_msgs message_runtime std_msgs

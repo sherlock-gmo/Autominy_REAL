@@ -1,8 +1,0 @@
-prefix=/home/sherlock2004/Autominy_REAL/autominy_ws/install
-
-Name: tmr2023
-Description: Description of tmr2023
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

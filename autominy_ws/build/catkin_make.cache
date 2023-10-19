@@ -1,2 +1,0 @@
-autominy_msgs:dotmex_final
--DCATKIN_DEVEL_PREFIX=/home/sherlock2004/Autominy_REAL/autominy_ws/devel -DCMAKE_INSTALL_PREFIX=/home/sherlock2004/Autominy_REAL/autominy_ws/install -DCATKIN_WHITELIST_PACKAGES=autominy_msgs;dotmex_final -G Unix Makefiles
