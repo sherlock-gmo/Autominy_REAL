@@ -1,8 +1,8 @@
-# Install script for directory: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/dotmex_final
+# Install script for directory: /home/sherlock2004/Autominy_REAL/autominy_ws/src/dotmex_final
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/sherlock2004/Autominy_REAL/autominy_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_final.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/sherlock2004/Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_final.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/dotmex_final/cmake" TYPE FILE FILES
-    "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_finalConfig.cmake"
-    "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_finalConfig-version.cmake"
+    "/home/sherlock2004/Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_finalConfig.cmake"
+    "/home/sherlock2004/Autominy_REAL/autominy_ws/build/dotmex_final/catkin_generated/installspace/dotmex_finalConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/dotmex_final" TYPE FILE FILES "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/dotmex_final/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/dotmex_final" TYPE FILE FILES "/home/sherlock2004/Autominy_REAL/autominy_ws/src/dotmex_final/package.xml")
 endif()
 

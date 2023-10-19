@@ -1,8 +1,8 @@
-# Install script for directory: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/gps_vis
+# Install script for directory: /home/sherlock2004/Autominy_REAL/autominy_ws/src/gps_vis
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/sherlock2004/Autominy_REAL/autominy_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_vis.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/sherlock2004/Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_vis.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gps_vis/cmake" TYPE FILE FILES
-    "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_visConfig.cmake"
-    "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_visConfig-version.cmake"
+    "/home/sherlock2004/Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_visConfig.cmake"
+    "/home/sherlock2004/Autominy_REAL/autominy_ws/build/gps_vis/catkin_generated/installspace/gps_visConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gps_vis" TYPE FILE FILES "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/gps_vis/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gps_vis" TYPE FILE FILES "/home/sherlock2004/Autominy_REAL/autominy_ws/src/gps_vis/package.xml")
 endif()
 

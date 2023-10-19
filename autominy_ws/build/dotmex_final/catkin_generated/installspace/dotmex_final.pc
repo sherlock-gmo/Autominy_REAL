@@ -1,4 +1,4 @@
-prefix=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install
+prefix=/home/sherlock2004/Autominy_REAL/autominy_ws/install
 
 Name: dotmex_final
 Description: Description of dotmex_final

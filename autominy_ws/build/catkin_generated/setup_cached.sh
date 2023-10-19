@@ -7,4 +7,4 @@
 # new environment variables
 
 # modified environment variables
-export PWD='/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build'
+export PWD='/home/sherlock2004/Autominy_REAL/autominy_ws/build'

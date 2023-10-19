@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "gps_vis"
-PROJECT_SPACE_DIR = "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install"
+PROJECT_SPACE_DIR = "/home/sherlock2004/Autominy_REAL/autominy_ws/install"
 PROJECT_VERSION = "0.0.0"

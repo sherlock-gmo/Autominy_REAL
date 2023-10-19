@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/CalibrationStatus.lisp"
-  "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/EulerAngles.lisp"
-  "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/Output.lisp"
+  "/home/sherlock2004/Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/CalibrationStatus.lisp"
+  "/home/sherlock2004/Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/EulerAngles.lisp"
+  "/home/sherlock2004/Autominy_REAL/autominy_ws/devel/share/common-lisp/ros/bno055_usb_stick_msgs/msg/Output.lisp"
   "CMakeFiles/bno055_usb_stick_msgs_generate_messages_lisp"
 )
 

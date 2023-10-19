@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for std_msgs_generate_messages_eus.
 
@@ -63,10 +63,10 @@ bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/build: std_m
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 
 bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_eus.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_eus.dir/cmake_clean.cmake
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/clean
 
 bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/depend
 

@@ -67,14 +67,14 @@ set(dotmex_final_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(dotmex_final_SOURCE_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/dotmex_final)
-  set(dotmex_final_DEVEL_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel)
+  set(dotmex_final_SOURCE_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/src/dotmex_final)
+  set(dotmex_final_DEVEL_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/devel)
   set(dotmex_final_INSTALL_PREFIX "")
   set(dotmex_final_PREFIX ${dotmex_final_DEVEL_PREFIX})
 else()
   set(dotmex_final_SOURCE_PREFIX "")
   set(dotmex_final_DEVEL_PREFIX "")
-  set(dotmex_final_INSTALL_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install)
+  set(dotmex_final_INSTALL_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/install)
   set(dotmex_final_PREFIX ${dotmex_final_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install/lib;/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/sherlock2004/Autominy_REAL/autominy_ws/install/lib;/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

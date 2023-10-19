@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  
+  image_transport
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -119,9 +122,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+find_package(OpenCV REQUIRED)
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -208,3 +213,12 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(camera_ELP_960_540 camera/src/camera_ELP_960_540.cpp)
+target_link_libraries(camera_ELP_960_540 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+
+
+
+
+

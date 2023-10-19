@@ -67,14 +67,14 @@ set(bno055_usb_stick_msgs_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(bno055_usb_stick_msgs_SOURCE_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs)
-  set(bno055_usb_stick_msgs_DEVEL_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel)
+  set(bno055_usb_stick_msgs_SOURCE_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs)
+  set(bno055_usb_stick_msgs_DEVEL_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/devel)
   set(bno055_usb_stick_msgs_INSTALL_PREFIX "")
   set(bno055_usb_stick_msgs_PREFIX ${bno055_usb_stick_msgs_DEVEL_PREFIX})
 else()
   set(bno055_usb_stick_msgs_SOURCE_PREFIX "")
   set(bno055_usb_stick_msgs_DEVEL_PREFIX "")
-  set(bno055_usb_stick_msgs_INSTALL_PREFIX /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/install)
+  set(bno055_usb_stick_msgs_INSTALL_PREFIX /home/sherlock2004/Autominy_REAL/autominy_ws/install)
   set(bno055_usb_stick_msgs_PREFIX ${bno055_usb_stick_msgs_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(bno055_usb_stick_msgs_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/include " STREQUAL " ")
+if(NOT "/home/sherlock2004/Autominy_REAL/autominy_ws/devel/include " STREQUAL " ")
   set(bno055_usb_stick_msgs_INCLUDE_DIRS "")
-  set(_include_dirs "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/include")
+  set(_include_dirs "/home/sherlock2004/Autominy_REAL/autominy_ws/devel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/include " STRE
         message(FATAL_ERROR "Project 'bno055_usb_stick_msgs' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'bno055_usb_stick_msgs' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'bno055_usb_stick_msgs' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/${idir}'.  ${_report}")
     endif()
     _list_append_unique(bno055_usb_stick_msgs_INCLUDE_DIRS ${include})
   endforeach()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib;/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib;/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

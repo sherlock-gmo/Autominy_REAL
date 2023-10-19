@@ -43,54 +43,54 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for bno055_usb_stick_msgs_generate_messages_py.
 
 # Include the progress variables for this target.
 include bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/progress.make
 
-bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
-bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
-bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
-bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py
+bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
+bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
+bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
+bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py
 
 
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Python from MSG bno055_usb_stick_msgs/CalibrationStatus"
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py: /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Python from MSG bno055_usb_stick_msgs/CalibrationStatus"
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
 
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating Python from MSG bno055_usb_stick_msgs/EulerAngles"
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py: /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating Python from MSG bno055_usb_stick_msgs/EulerAngles"
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
 
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/Output.msg
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/geometry_msgs/msg/Vector3.msg
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Python from MSG bno055_usb_stick_msgs/Output"
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/Output.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/Output.msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/CalibrationStatus.msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/geometry_msgs/msg/Vector3.msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py: /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/EulerAngles.msg
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Python from MSG bno055_usb_stick_msgs/Output"
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg/Output.msg -Ibno055_usb_stick_msgs:/home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs/msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p bno055_usb_stick_msgs -o /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg
 
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
-/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating Python msg __init__.py for bno055_usb_stick_msgs"
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg --initpy
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
+/home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/sherlock2004/Autominy_REAL/autominy_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating Python msg __init__.py for bno055_usb_stick_msgs"
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg --initpy
 
 bno055_usb_stick_msgs_generate_messages_py: bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py
-bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
-bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
-bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
-bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py
+bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_CalibrationStatus.py
+bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_EulerAngles.py
+bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/_Output.py
+bno055_usb_stick_msgs_generate_messages_py: /home/sherlock2004/Autominy_REAL/autominy_ws/devel/lib/python3/dist-packages/bno055_usb_stick_msgs/msg/__init__.py
 bno055_usb_stick_msgs_generate_messages_py: bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/build.make
 
 .PHONY : bno055_usb_stick_msgs_generate_messages_py
@@ -101,10 +101,10 @@ bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/build
 
 bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && $(CMAKE_COMMAND) -P CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs && $(CMAKE_COMMAND) -P CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/cmake_clean.cmake
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/clean
 
 bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/bno055_usb_stick_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : bno055_usb_stick_msgs/CMakeFiles/bno055_usb_stick_msgs_generate_messages_py.dir/depend
 

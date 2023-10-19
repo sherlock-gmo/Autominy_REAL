@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for _autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.
 
@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
 include autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/progress.make
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/autominy_msgs/msg/NormalizedSteeringCommand.msg std_msgs/Header
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/src/autominy_msgs/msg/NormalizedSteeringCommand.msg std_msgs/Header
 
 _autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand: autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand
 _autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand: autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/build.make
@@ -67,10 +67,10 @@ autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedS
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/build
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/cmake_clean.cmake
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/clean
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_NormalizedSteeringCommand.dir/depend
 

@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for actionlib_msgs_generate_messages_nodejs.
 
@@ -63,10 +63,10 @@ autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/build: acti
 .PHONY : autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/build
 
 autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
 .PHONY : autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/clean
 
 autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : autominy_msgs/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/depend
 

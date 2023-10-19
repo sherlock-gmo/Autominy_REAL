@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for _autominy_msgs_generate_messages_check_deps_TrajectoryPoint.
 
@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
 include autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/progress.make
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/autominy_msgs/msg/TrajectoryPoint.msg geometry_msgs/Twist:geometry_msgs/Pose:geometry_msgs/Point:geometry_msgs/Vector3:geometry_msgs/Quaternion
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/src/autominy_msgs/msg/TrajectoryPoint.msg geometry_msgs/Vector3:geometry_msgs/Pose:geometry_msgs/Quaternion:geometry_msgs/Twist:geometry_msgs/Point
 
 _autominy_msgs_generate_messages_check_deps_TrajectoryPoint: autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint
 _autominy_msgs_generate_messages_check_deps_TrajectoryPoint: autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/build.make
@@ -67,10 +67,10 @@ autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryP
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/build
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs && $(CMAKE_COMMAND) -P CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/cmake_clean.cmake
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/clean
 
 autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : autominy_msgs/CMakeFiles/_autominy_msgs_generate_messages_check_deps_TrajectoryPoint.dir/depend
 

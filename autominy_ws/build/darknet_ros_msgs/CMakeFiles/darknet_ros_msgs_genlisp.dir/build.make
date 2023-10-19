@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src
+CMAKE_SOURCE_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build
+CMAKE_BINARY_DIR = /home/sherlock2004/Autominy_REAL/autominy_ws/build
 
 # Utility rule file for darknet_ros_msgs_genlisp.
 
@@ -63,10 +63,10 @@ darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/build: darknet_ros_msgs
 .PHONY : darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/build
 
 darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/clean:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/darknet_ros_msgs && $(CMAKE_COMMAND) -P CMakeFiles/darknet_ros_msgs_genlisp.dir/cmake_clean.cmake
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build/darknet_ros_msgs && $(CMAKE_COMMAND) -P CMakeFiles/darknet_ros_msgs_genlisp.dir/cmake_clean.cmake
 .PHONY : darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/clean
 
 darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/depend:
-	cd /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/src/darknet_ros_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/darknet_ros_msgs /home/sherlock2004/dotMEX_Autominy_REAL/autominy_ws/build/darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sherlock2004/Autominy_REAL/autominy_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sherlock2004/Autominy_REAL/autominy_ws/src /home/sherlock2004/Autominy_REAL/autominy_ws/src/darknet_ros_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build /home/sherlock2004/Autominy_REAL/autominy_ws/build/darknet_ros_msgs /home/sherlock2004/Autominy_REAL/autominy_ws/build/darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : darknet_ros_msgs/CMakeFiles/darknet_ros_msgs_genlisp.dir/depend
 
