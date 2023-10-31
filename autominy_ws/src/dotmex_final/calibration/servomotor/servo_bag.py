@@ -5,7 +5,7 @@ import random
 import numpy as np
 from autominy_msgs.msg import SteeringAngle, NormalizedSteeringCommand
 
-path_data = '/home/ros/dotMEX_Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servo_motor/'
+path_data = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
 steering_msg = NormalizedSteeringCommand() # -1.0 to 1.0
 
 #**********************************************************************************************************************************
@@ -28,7 +28,7 @@ class autominy(object):
 #																	Duffin Oscilator
 	def f_duffin(self,T,z10,z20,w,h):
 		z1 = z10+h*w*z20
-		z2 = z20+h*(w*z1-0.025*z20-0.75*w*(z1**3)+0.3*m.sin(w*T))
+		z2 = z20+h*(w*z1-0.025*z20-0.75*w*(z1**3)+0.3*np.sin(w*T))
 		s = (3.33/5.89)*z1
 		return s, z1, z2
 #----------------------------------------------------------------------------------------------------------------
