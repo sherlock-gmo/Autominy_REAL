@@ -25,18 +25,34 @@ def get_data(path,file_csv):
 	return T, Sgamma, Mgamma
 #**************************************************************************************************
 # Calculo de la matriz de transicion de estados
-def F_calc(c,a2,k,h):
+def F_complex_calc(c,a2,k,h):
 	F11 = np.exp(c*h)*(np.cos(k*h)-(c/k)*np.sin(k*h))
-	F12 = (1/k)*np.exp(c*h)*np.sin(k*h)
+	F12 = (1.0/k)*np.exp(c*h)*np.sin(k*h)
 	F21 = (-a2/k)*np.exp(c*h)*np.sin(k*h)
 	F22 = np.exp(c*h)*(np.cos(k*h)+(c/k)*np.sin(k*h))
 	F = np.array([[F11,F12],[F21,F22]])
 	return F
+def F_real_calc(a1,a2,p1,p2,h):
+	A = 1.0/(p2-p1)
+	Ap = -(p1)/(p2-p1)
+	F11 = (Ap+a1*A)*np.exp(-p1*h)+(1-Ap-a1*A)*np.exp(-p2*h)
+	F12 = A*(np.exp(-p1*h)-np.exp(-p2*h))
+	F21 = (-a2*A)*(np.exp(-p1*h)-np.exp(-p2*h))
+	F22 = Ap*np.exp(-p1*h)+(1-Ap)*np.exp(-p2*h)
+	F = np.array([[F11,F12],[F21,F22]])
+	return F
 #**************************************************************************************************
 # Calculo de la matriz Bd
-def Bd_calc(b,c,k,h):
+def Bd_complex_calc(b,c,k,h):
 	Bd1 = (b/(k*(c**2+k**2)))*(np.exp(c*h)*(c*np.sin(k*h)-k*np.cos(k*h))+k)
 	Bd2 = (b/(c**2+k**2))*(np.exp(c*h)*(k*np.sin(k*h)+c*np.cos(k*h))-c)+((b*c)/(k*(c**2+k**2)))*(np.exp(c*h)*(c*np.sin(k*h)-k*np.cos(k*h))+k)
+	Bd = np.array([[Bd1],[Bd2]])
+	return Bd
+def Bd_real_calc(b,p1,p2,h):
+	A = 1.0/(p2-p1)
+	Ap = -(p1)/(p2-p1)
+	Bd1 = b*A*(((np.exp(-p2*h)-1)/p2)-((np.exp(-p1*h)-1)/p1))
+	Bd2 = b*Ap*((1-np.exp(-p1*h))/p1)+b*(1-Ap)*((1-np.exp(-p2*h))/p2)
 	Bd = np.array([[Bd1],[Bd2]])
 	return Bd
 #**************************************************************************************************
@@ -50,22 +66,29 @@ def Q_calc(sigma_Mgamma,h):
 
 #****************************************************************PARAMETROS INICIALES
 # Mediciones de la posicion del auto
-path = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
+#path = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
+path = '/home/sherlock2204f/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
 file_csv = 'servo_bag1.csv'
 
 # Parametros del filtro
 h = 0.01											# Periodo de muestreo [s]
 sigma_Mgamma = 0.009			# Des. Est. de la medicion de la posicion del servomotor
 # Parametros del modelo
-b = 2.0
-a1 = 15.0
-a2 = 150.0
-# Parametros auxiliares
-c = -a1/2.0
-k = np.sqrt(a2-(a1**2/4.0))
+b = 96.6
+a1 = 85.5
+a2 = 335.7
 # Matrices para el filtro de Kalman
-F = F_calc(c,a2,k,h)
-Bd = Bd_calc(b,c,k,h)
+k2 = a2-(a1**2/4.0)
+if (k2>0): 
+	c = -a1/2.0
+	k = np.sqrt(k2)
+	F = F_complex_calc(c,a2,k,h)
+	Bd = Bd_complex_calc(b,c,k,h)
+else: 
+	p1 = (-a1+np.sqrt((a1**2)-4*a2))/2.0
+	p2 = (-a1-np.sqrt((a1**2)-4*a2))/2.0
+	F = F_real_calc(a1,a2,p1,p2,h)
+	Bd = Bd_real_calc(b,p1,p2,h)
 Q = Q_calc(sigma_Mgamma,h)
 R = np.array([[sigma_Mgamma**2]]) # Si es un escalar, definirlo como matriz de 1x1
 H = np.array([[1, 0]])
