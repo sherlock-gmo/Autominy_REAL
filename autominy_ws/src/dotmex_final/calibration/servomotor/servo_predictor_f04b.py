@@ -4,7 +4,7 @@ from scipy.linalg import solve_continuous_lyapunov as lyp
 import matplotlib.pyplot as plt
 
 # Se cargan los datos del regresor
-States = np.load('states02.npy')
+States = np.load('states.npy')
 print(States.shape)
 T = States[:,0]
 S_gamma = States[:,1]
@@ -59,11 +59,11 @@ for i in range(1,N[0]):
 	Da2_hat = gamma2*(e2)*M_gamma[i]
 	Da2_hat_h = gamma2*(e2_h)*M_gamma[i-1]
 	a2_hat[i] = a2_hat[i-1]+(h/2.0)*(Da2_hat+Da2_hat_h)
-
+	"""
 	Dc_hat = gamma3*(e2)*sDM_gamma[i]
 	Dc_hat_h = gamma3*(e2_h)*sDM_gamma[i-1]
 	c_hat[i] = c_hat[i-1]+(h/2.0)*(Dc_hat+Dc_hat_h)
-
+	"""
 	Db_hat = -gamma4*(e2)*S_gamma[i]
 	Db_hat_h = -gamma4*(e2_h)*S_gamma[i-1]
 	b_hat[i] = b_hat[i-1]+(h/2.0)*(Db_hat+Db_hat_h)

@@ -86,9 +86,9 @@ file_csv = 'servo_bag3.csv'
 h = 0.01											# Periodo de muestreo [s]
 sigma_Mgamma = 0.009			# Des. Est. de la medicion de la posicion del servomotor
 # Parametros del modelo
-b = 2.0		#2.0
-a1 = 5.0 #25.0 #5.0
-a2 = 7.0 #150.0 #7.0
+b = 22.28212399766643		#2.0
+a1 = 21.367358140948884 #25.0 #5.0
+a2 = 140.09201644070785 #150.0 #7.0
 # Matrices para el filtro de Kalman
 k2 = a2-(a1**2/4.0)
 if (k2>0): complex_f = True
@@ -111,7 +111,7 @@ Xk = Kalman.alg_kalman_offline(X0,P0,F,Bd,S_gamma,H,R,Q,M_gamma)
 states = np.concatenate((T,S_gamma),axis=1)
 states = np.concatenate((states,Xk[:,0]),axis=1)
 states = np.concatenate((states,Xk[:,1]),axis=1)
-np.save('states02.npy', states)
+np.save('states03.npy', states)
 print(states.shape)
 
 # Coparacion con la derivada numerica y el filtro pasa-altos

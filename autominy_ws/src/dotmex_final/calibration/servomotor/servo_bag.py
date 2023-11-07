@@ -18,7 +18,7 @@ class autominy(object):
 	def __init__(self):
 		self.z10 = 0.0
 		self.z20 = 0.0
-		self.w = 2.5							# Escala de tiempo del oscilador en [rad/s]
+		self.w = 3.5 #2.5							# Escala de tiempo del oscilador en [rad/s]
 		#self.h = 1.0/30.0					
 		self.t0 = time.time()
 		self.tk = self.t0
@@ -43,7 +43,7 @@ class autominy(object):
 		steering_msg.value = s
 		self.Spub.publish(steering_msg)
 		# Guardado de datos
-		N = 1
+		N = 3
 		f = open(path_data+'servo_bag'+str(N)+'.csv','a+')
 		f.write("%5.6f	%5.6f	%5.6f	%5.6f\n" %(T, h, steering_msg.value, self.st_sensor))
 		f.close()
