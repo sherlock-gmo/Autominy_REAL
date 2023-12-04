@@ -15,12 +15,12 @@ def get_data(path,file_csv):
 	with open(path+file_csv, 'r') as datafile:
 		ploting = csv.reader(datafile, delimiter='\t')
 		for ROWS in ploting:
-			T.append(float(ROWS[0]))
-			Sgamma.append(float(ROWS[1]))
-			Mgamma.append(float(ROWS[2]))
 			#T.append(float(ROWS[0]))
-			#Sgamma.append(float(ROWS[2]))
-			#Mgamma.append(float(ROWS[3]))
+			#Sgamma.append(float(ROWS[1]))
+			#Mgamma.append(float(ROWS[2]))
+			T.append(float(ROWS[0]))
+			Sgamma.append(float(ROWS[2]))
+			Mgamma.append(float(ROWS[3]))
 		N = len(T)
 		T = np.reshape(np.array(T).T,(N,1))
 		Sgamma = np.reshape(np.array(Sgamma).T,(N,1))
@@ -77,10 +77,10 @@ def Q_calc(sigma_Mgamma,h):
 
 #****************************************************************PARAMETROS INICIALES
 # Mediciones de la posicion del auto
-#path = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
-path = '/home/sherlock2204f/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
-file_csv = '/data/sensors_servo_test_175.csv'
-#file_csv = 'servo_bag3.csv'
+path = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
+#path = '/home/sherlock2204f/Autominy_REAL/autominy_ws/src/dotmex_final/calibration/servomotor/'
+#file_csv = '/data/sensors_servo_test_225.csv'
+file_csv = 'servo_bag3.csv'
 
 # Parametros del filtro
 h = 0.01											# Periodo de muestreo [s]
@@ -111,7 +111,7 @@ Xk = Kalman.alg_kalman_offline(X0,P0,F,Bd,S_gamma,H,R,Q,M_gamma)
 states = np.concatenate((T,S_gamma),axis=1)
 states = np.concatenate((states,Xk[:,0]),axis=1)
 states = np.concatenate((states,Xk[:,1]),axis=1)
-np.save('states_ex.npy', states)
+np.save('states02.npy', states)
 print(states.shape)
 
 # Coparacion con la derivada numerica y el filtro pasa-altos
