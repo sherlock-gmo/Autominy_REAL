@@ -20,7 +20,7 @@ def seg_img(imagen0,y_cut):
 	return imagenSeg
 #**********************************************************************************************************************************
 #**********************************************************************************************************************************
-def get_list(imagenSeg,y_cut,x_tras,K,dist_coeffs,nK):
+def get_list(imagenSeg,y_cut,x_tras,y_tras,H,K,dist_coeffs,nK):
 	# Encontrar las coordenadas de los pixeles blancos
 	list_px = cv2.findNonZero(imagenSeg)				
 	# Suma y_cut a la coordenada y para mantener el sistema coordenado correcto
@@ -28,7 +28,8 @@ def get_list(imagenSeg,y_cut,x_tras,K,dist_coeffs,nK):
 	list_px = list_px.astype(np.float32)
 	list_px = cv2.undistortPoints(list_px, K, dist_coeffs, R=None, P=nK)
 	# Traslacion necesaria para antener el sistema coordenado correcto
-	list_px[:,:, 0] -= x_tras #228							
+	list_px[:,:, 0] -= x_tras #198						
+	list_px[:,:, 1] -= y_tras #172						
 	list_px = cv2.perspectiveTransform(list_px, H)
 	N,_,_ = list_px.shape	
 	list_px = np.reshape(list_px,(N,2))
@@ -47,15 +48,15 @@ def fit_ransac(coordenadas_lista):
 	# Obtener los inliers y outliers del modelo ajustado
 	inliers_mask = ransac.inlier_mask_
 	#outliers_mask = np.logical_not(inliers_mask)
-	# Obtener la pendiente y el término independiente del modelo ajustado
+	# Obtener la pendiente y el termino independiente del modelo ajustado
 	m = ransac.estimator_.coef_[0][0]
 	b = ransac.estimator_.intercept_[0]
-	# Calcular el error cuadrático medio de los inliers
+	# Calcular el error cuadratico medio de los inliers
 	r = mean_squared_error(y[inliers_mask], ransac.predict(x[inliers_mask]))
 	# Imprimir los resultados
 	#print("m: ",m)
 	#print("b: ", b)
-	#print("Error cuadrático medio de los inliers: ", inliers_error)
+	#print("Error cuadratico medio de los inliers: ", inliers_error)
 	return m,b,r
 #**********************************************************************************************************************************
 #**********************************************************************************************************************************
@@ -97,6 +98,7 @@ def seg_lines(Y0,M,B,R,l):
 			del Y0[k]
 			del M[k]
 			del B[k]
+		k = k+1
 
 	# Linea Der.
 	i = np.argmax(np.array(Y0))
@@ -132,21 +134,26 @@ def seg_lines(Y0,M,B,R,l):
 #**********************************************************************************************************************************
 # Crear un estimador RANSACRegressor para ajuste lineal
 ransac = RANSACRegressor()
-
-H = np.array([[-7.10413148e-02,-1.05243615,1.63532529e+02],[-3.40016154e-02,-2.17357369,3.17446522e+02],[-1.10253784e-04,-7.04538511e-03,1.0]])
+H = np.array([[-5.37973506e-02,-1.31762265,1.63979885e+02],[6.45042207e-03,-2.72330382,3.17042324e+02],[2.76842149e-05,-8.84786795e-03,1.0]])
 K = np.array([[410.80239519,0.0,469.13953267],[0.0,412.74534584,258.91870387],[0.0,0.0,1.0]])
 dist_coeffs = np.array([[-2.80892642e-01,7.20543846e-02,-1.77783135e-04,-9.27152558e-04,-7.49371778e-03]])
-nK, _ = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (540,960), alpha=1)
+#nK, _ = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (540,960), alpha=1)
+u = 540
+v = 960 #img.shape #[960,540]
+nK,_ = cv2.getOptimalNewCameraMatrix(K, dist_coeffs, (u,v), 1, (u,v))
 
 y_cut = 270	# Recorte vertical de la imagen
-x_tras = 228	# Traslacion para recortar la imagen sin distorcion
+x_tras = 198 # Traslacion para recortar la imagen sin distorcion
+y_tras = 172
 
 # Adquiere la imagen
-imagen0 = cv2.imread('image_960_540_r.png')									
+imagen0 = cv2.imread('image_960_540_wl.png')			
+print(imagen0.shape)						
 # Segmenta la imagen
 imagenSeg =seg_img(imagen0,y_cut)	
 # Obtiene los pixeles blancos y les aplica quita la distorcion radial y tangencial, y aplica la homografia
-list_px = get_list(imagenSeg,y_cut,x_tras,K,dist_coeffs,nK) 
+list_px = get_list(imagenSeg,y_cut,x_tras,y_tras,H,K,dist_coeffs,nK) 
+
 # Le aplica RANSAC a los puntos y los separa en grupos
 # El eje vertical de la imagen es el eje x
 # El eje horizontal de la imagen es el eje y
@@ -165,18 +172,20 @@ print(Pd)
 print(Pc)
 print(Pi)
 
-imagenH = cv2.imread('homography_960_540_r.png')
+imagenH = cv2.imread('homography_960_540.png')
+#imagenH = np.zeros((540,960,3))
 print(imagenSeg.shape)
 h,w = imagenSeg.shape
-#imagenH = np.zeros((300,300,3))
 for x,y in list_px:	imagenR = cv2.circle(imagenH, (int(x), int(y)), 1, (0, 255, 0), -1)
 imagenR =cv2.line(imagenR, (y2_d,x2_d),(y1_d,x1_d), (255,0,0), 2)
 imagenR =cv2.line(imagenR, (y2_i,x2_i),(y1_i,x1_i), (0,0,255), 2)
 imagenR =cv2.line(imagenR, (y2_c,x2_c),(y1_c,x1_c), (255,255,255), 2)
 
 
-cv2.imshow('original',imagen0)
-cv2.imshow('homography',imagenR)
+#cv2.imshow('original',imagen0)
+#cv2.imshow('seg',imagenSeg)
+#cv2.imshow('homography',imagenR)
+cv2.imshow('test',imagenR)
 cv2.waitKey(0)
 cv2.imwrite('homography_960_540_FINAL_mask2.png',imagenR)
 cv2.destroyAllWindows()

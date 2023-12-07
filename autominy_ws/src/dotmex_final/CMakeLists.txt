@@ -215,7 +215,10 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(camera_ELP_960_540 camera/src/camera_ELP_960_540.cpp)
+add_executable(camera_ELP_960_540_f camera/src/camera_ELP_960_540_f.cpp)
+
 target_link_libraries(camera_ELP_960_540 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(camera_ELP_960_540_f ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 
 
