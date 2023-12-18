@@ -6,6 +6,10 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from autominy_msgs.msg import SpeedPWMCommand, NormalizedSteeringCommand
 
+import time
+
+
+
 path_libs ='/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/control/libs'
 import sys
 sys.path.insert(1, path_libs)
@@ -36,6 +40,15 @@ class autominy(object):
 		self.imagenF = np.zeros((640,480))
 		self.v = 185 #145-275
 		"""
+		self.k = 0
+		self.W = np.zeros((3,2))
+
+		self.x0 = 0
+		self.y0 = 0
+		self.x1 = 0
+		self.y1 = 0
+		self.imagenT = np.zeros((960,540,3))
+
 		rospy.Subscriber("/sensors/camera/color/image_raw",Image,self.callback_Cam)
 		self.Vpub = rospy.Publisher('/actuators/speed_pwm',SpeedPWMCommand,queue_size=15)
 		self.Spub = rospy.Publisher('/actuators/steering_normalized',NormalizedSteeringCommand,queue_size=15)
@@ -45,46 +58,53 @@ class autominy(object):
 #																	CAMERA RGB
 #----------------------------------------------------------------------------------------------------------------
 	def callback_Cam(self,data_camera):
+		#start_time = time.time()
+
 		#____________________________Procesamiento de la imagen
 		imagen0 = bridge.imgmsg_to_cv2(data_camera, "bgr8") 	# Imagen cv2
 		# Segmenta la imagen
-		imagenSeg = LKF.seg_img(imagen0)	
+		imagenSeg = LKF.seg_img(imagen0, True)	
 		# Obtiene los pixeles blancos y les aplica quita la distorcion radial y tangencial, y aplica la homografia
 		list_px = LKF.get_list(imagenSeg) 
 
-		# Le aplica RANSAC a los puntos y los separa en grupos
-		# El eje vertical de la imagen es el eje x
-		# El eje horizontal de la imagen es el eje y
-		M, B, R, Y0 = LKF.get_lines(list_px) 														
-		#print('M ',M)
-		#print('B ',B)
-		print('R ',R)
-		#print('Y0 ',Y0)
-		"""
-		l = 200 #[cm]
-		Pd, _, Pi = LKF.seg_lines(Y0,M,B,R,l)
-		x1_d,y1_d,x2_d,y2_d = Pd
-		#x1_c,y1_c,x2_c,y2_c = Pc
-		x1_i,y1_i,x2_i,y2_i = Pi
-		print(Pd)
-		#print(Pc)
-		print(Pi)
-		"""
-		#imagenH = np.zeros((300,300,3))
-		#for x,y in list_px:	imagenR = cv2.circle(imagenH, (int(x), int(y)), 2, (0, 255, 0), -1)
-		#imagenR =cv2.line(imagenR, (y2_d,x2_d),(y1_d,x1_d), (255,0,0), 2)
-		#imagenR =cv2.line(imagenR, (y2_i,x2_i),(y1_i,x1_i), (0,0,255), 2)
-		#imagenR =cv2.line(imagenR, (y2_c,x2_c),(y1_c,x1_c), (255,255,255), 2)
+		if (self.k==0):
+			# Se entrena el clasificador de datos durante K iteraciones
+			K = 150 #150	 
+			for k in range (0,K): 
+				#	Se busca un punto de forma aleatoria y se hace una regresion lineal con sus vecinos
+				p, m, b = LKF.min_line(list_px,LKF.eps,LKF.n0)
+				# Se actualizan el clasificador de lineas
+				LKF.L = LKF.act_line(LKF.L,p,m,b,LKF.alpha)
+				# Se obtienen las lineas segmentadas
+				self.k=self.k+1
+
+		LKF.L, R = LKF.get_lines(list_px,LKF.L,10.0)
+
+		#print('t = ', (time.time()-start_time))
+		#print(R)
 
 
-		#cv2.imshow('test',imagenR)
-		#cv2.imshow('seg',imagenSeg)
-		#cv2.imshow('homografia',imagenR)
-		#cv2.waitKey(1)
+		# VISUALIZACION
+		x1r = 200
+		x2r = 299
+		y1r = int(round(x1r*LKF.L[0,0]+LKF.L[1,0]))
+		y2r = int(round(x2r*LKF.L[0,0]+LKF.L[1,0]))
+		x1c = 200
+		x2c = 299
+		y1c = int(round(x1c*LKF.L[0,1]+LKF.L[1,1]))
+		y2c = int(round(x2c*LKF.L[0,1]+LKF.L[1,1]))
+		x1l = 200
+		x2l = 299
+		y1l = int(round(x1l*LKF.L[0,2]+LKF.L[1,2]))
+		y2l = int(round(x2l*LKF.L[0,2]+LKF.L[1,2]))
+		imagenH = np.zeros((300,300,3))
+		for x,y in list_px:	imagenH = cv2.circle(imagenH, (int(x), int(y)), 2, (0, 255, 0), -1)
+		imagenH =cv2.line(imagenH, (y1r,x1r),(y2r,x2r), (0,0,255), 3)
+		imagenH =cv2.line(imagenH, (y1c,x1c),(y2c,x2c), (0,0,255), 3)
+		imagenH =cv2.line(imagenH, (y1l,x1l),(y2l,x2l), (0,0,255), 3)
 
-
-
-
+		cv2.imshow('test',imagenH)
+		cv2.waitKey(1)
 
 
 		"""
