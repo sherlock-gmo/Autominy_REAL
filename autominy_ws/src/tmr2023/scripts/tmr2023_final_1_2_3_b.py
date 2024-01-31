@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import cv2
+import time
 import rospy
 import numpy as np
 from bno055_usb_stick_msgs.msg import Output
@@ -14,7 +15,7 @@ path_libs ='/home/ros/dotMEX_Autominy_REAL/autominy_ws/src/tmr2023/scripts/libs'
 import sys
 sys.path.insert(1, path_libs)
 from lib_lanekeep_functions import tip, roi_zone, vec_create, line_detector #,vis_cam
-from lib_lidar_functions import lidar_roi_f, lidar4ransac, lidar_ev #,vis_lidar
+from lib_lidar_functions import lidar_roi_f, lidar4ransac, lidar_ev, lidar_roi_f2     #,vis_lidar
 from lib_parking_functions import steer_control, fit_ransac
 from lib_model_builder import get_KBW
 from lib_nn_maneuver import get_NNmaneuver
@@ -41,7 +42,7 @@ class autominy(object):
 		#V. Lidar
 		self.step = 0
 		self.R = np.zeros(360)
-		self.s_obj = False
+		self.s_obj = 0
 		#V. Camera
 		self.l = 30 #30 # Tamano de la recta con que se modela el camino
 		self.FT = 0
@@ -54,8 +55,9 @@ class autominy(object):
 		#self.e_y_h = 0.0
 		#self.Ie_y = 0.0
 		# V. YOLO
-		self.v_max = 185 #145-275
+		self.v_max = 185 #235 #185-275
 		self.s_carro = 0
+		self.s_alto = 0
 		#V. Behavior Control
 		self.s_rojo = 0
 		self.s_peat = 0
@@ -63,6 +65,11 @@ class autominy(object):
 		self.s_ev = 0
 		#V. Parallel Parking
 		self.space_count = 0
+		self.stop_rs = False
+		self.car1 = False
+		self.space_free = False
+
+
 
 		rospy.Subscriber('/parking',Int16,self.callback_Park)
 		rospy.Subscriber('/sensors/bno055/output', Output, self.callback_Imu)
@@ -100,7 +107,7 @@ class autominy(object):
 #----------------------------------------------------------------------------------------------------------------
 #																	LIDAR
 	def callback_Lidar(self, data_lidar):
-		rmax = 1.5 # Distancia maxima de deteccion
+		rmax = 2.5 # Distancia maxima de deteccion
 		i = 0
 		self.R = np.clip(data_lidar.ranges,0.08,rmax)
 		cam_post = [157,158,159,160,161,162,200,201,202,203,204]
@@ -110,8 +117,8 @@ class autominy(object):
 		R0 = np.concatenate((R0_i,R0_d),axis=None)
 		r0 = np.min(R0)
 		if (r0<=0.9): #0.9
-			self.s_obj = True
-		else: self.s_obj = False
+			self.s_obj = 1
+		else: self.s_obj = 0
 #----------------------------------------------------------------------------------------------------------------
 #																	CAMERA RGB
 	def callback_Cam(self,data_camera):
@@ -122,6 +129,7 @@ class autominy(object):
 		upper = np.array([140,255,255])	#RGB:140,255,255 # BGR: 11,255,255
 		imagenS = cv2.inRange(cv2.cvtColor(imagen0,cv2.COLOR_BGR2HSV),lower,upper)
 		imagenS = cv2.medianBlur(imagenS,1)
+		#imagenS = cv2.Sobel(imagenS,cv2.CV_8U,1,0, ksize=3)
 		self.imagenF = tip(imagenS) 	# TIP
 #----------------------------------------------------------------------------------------------------------------
 #																	YOLO
@@ -129,6 +137,7 @@ class autominy(object):
 		self.s_peat = 0
 		self.s_carro = 0
 		self.s_rojo = 0
+		self.s_alto = 0
 		id_class = data_yolo.bounding_boxes
 		for i in range(len(id_class)):
 			id_number = id_class[i].id
@@ -141,37 +150,40 @@ class autominy(object):
 			#if (id_number == 17) and (area>=2167): self.stop = True	# Sem Rojo
 			if (id_number == 13) and (area>=2000): self.v_max = 185		# lim 50km_h
 			if (id_number == 14) and (area>=2000): self.v_max = 235		# lim 100km_h
-			if (id_number == 8) and (area>=2450): self.s_rojo = 1		# Alto
+			if (id_number == 8) and (area>=1700): self.s_alto = 1		# Alto
+			# v=225 => area = 2000
+			# v=235 => area = xxx
 			#if (id_number == 9) and (area>=2450): self.NoEst = True	# No estacionarse
 
 			# Objetos del camino
-			if (id_number == 4) and (area>=1750) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
-			if (id_number == 0) and (area>=8500) and (220<=cx<=425) and (p>=0.85): self.s_carro = 1		# Carro
+			if (id_number == 4) and (area>=1500) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
+			#if (id_number == 0) and (area>=8500) and (215<=cx<=430) and (p>=0.8): self.s_carro = 1		# Carro
+			if (id_number == 0) and (area>=6000) and (215<=cx<=430) and (p>=0.8): self.s_carro = 1          # Carro
 
-		"""
-		id		class			area_min
-		----------------------------------------------
-		0		carro
-		1		camion
-		2		bicicleta
-		3		moto
-		4		peaton
-		5		perro
-		6		gato
-		7		caballo
-		8		alto
-		9		noest
-		10		20km
-		11		30km
-		12		40km
-		13		50km			2450
-		14		100km			1500
-		15		sem_verde
-		16		sem_amarillo
-		17		sem_rojo
-		18		sem_NA
-		19		tren
-		"""
+			"""
+			id		class			area_min
+			----------------------------------------------
+			0		carro
+			1		camion
+			2		bicicleta
+			3		moto
+			4		peaton
+			5		perro
+			6		gato
+			7		caballo
+			8		alto
+			9		noest
+			10		20km
+			11		30km
+			12		40km
+			13		50km			2450
+			14		100km			1500
+			15		sem_verde
+			16		sem_amarillo
+			17		sem_rojo
+			18		sem_NA
+			19		tren
+			"""
 
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -218,19 +230,44 @@ class autominy(object):
 
 
 		# Maneuver selector
-		maneuver = 1 #2
-		self.side = -1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
-
+		"""
+		# Prueba 1
+		if (self.s_alto==0):
+			maneuver = 2
+			self.side = 1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		if (self.s_alto==1):
+			maneuver = 5
+		"""
+		"""
+		# Pruebas 2 y 3
+		if (self.s_obj==1) and (self.s_carro==1):
+			self.s_ev=1
+		if (self.s_ev==0):
+			maneuver = 2
+		else:
+			maneuver = 1
+			self.FT = 0
+			self.space_count = self.space_count+1
+			x_alin = (0.065)*(1.0/30.0)*self.space_count # v=185 => 0.065[m/s]
+			if (x_alin>=0.8):
+				maneuver = 2
+				self.s_ev = 0
+				self.FT = 0
+				self.space_count = 0
+		"""
+		
+		# Prueba 4
+		maneuver = 4
+		self.side = 1
+		
 
 		if (maneuver==0):
 			print('---------ALTO TOTAL------------')
 			self.stop_car()
 		if (maneuver==1):
-			#print('--------SEGUIMIENTO DEL CARRIL-----------')
 			print('--------SEGUIMIENTO DEL CARRIL IZQUIERDO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==2):
-			#print('--------EVASION-----------')
 			print('--------SEGUIMIENTO DEL CARRIL DERECHO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==3):
@@ -239,6 +276,9 @@ class autominy(object):
 		if (maneuver==4):
 			print('-----------ESTACIONAMIENTO PPERPENDICULAR-----------')
 			self.perpendicular_parking()
+		if (maneuver==5):
+			print('------------ALTO PARCIAL---------')
+			self.stop_car_p()
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -261,22 +301,22 @@ class autominy(object):
 			# Derecha
 			self.v = self.v_max #175
 			self.side = 1
-			self.x_ref = 118 #115
-			self.x_search = 180
+			self.x_ref = 118 #118
+			self.x_search = 150 #180
 			self.l = 30
 		if (maneuver==1):
 			# Izquierda
-			self.v = 175 #self.v_max
+			self.v = 185  #175
 			self.side = -1
-			self.x_ref = 82 #85
-			self.x_search = 20
+			self.x_ref = 75 #82
+			self.x_search = 30
 			self.l = 50
 
 		speed_msg.value = self.v
 		y1 = 0
 		y2 = 0
 		#________________________________________Busca la linea
-		if (self.FT<=10):
+		if (self.FT<=10): #10
 			#print('-----------INCORPORAMIENTO AL CARRIL-----------')
 			x1 = self.x_search
 			self.FT = self.FT+1
@@ -299,8 +339,8 @@ class autominy(object):
 
 		steering_msg.value = np.arctan(-Ky*e_y-Kth*e_th)*(2.0/np.pi) #Normalizado
 		#self.e_y_h = e_y
-		print(x1,y1)
-		print(x2,y2)
+		#print(x1,y1)
+		#print(x2,y2)
 		print('steering ',steering_msg.value)
 		#print('speed ',speed_msg.value)
 		print('*********************')
@@ -401,34 +441,77 @@ class autominy(object):
 #----------------------------------------------------------------------------------------------------------------
 #																PERPENDICULAR PARKING
 	def perpendicular_parking(self):
-			Nv = 185 #185-215
+			Nv = 250 #250 Bateria FULL
 			r180 = np.amin(self.R[159:199]) #162,199 #np.amin(self.R[165:205])
 			k = (-1)*self.side
-
+			#self.d = 2.0
+			#m = 5.0
 			if (self.step == 0):
 				ymax = 1.75 #[m]
 				ymin = 0.35 #0.35
 				R_side = lidar4ransac(self.R,ymax,ymin,self.side) # Puntos del lidar usados para el RANSAC
 				m,b = fit_ransac(R_side,3.0)
 				v = Nv
-				d_ref = 75.0*k # Separacion en [cm]
+				d_ref = 80.0*k # Separacion en [cm]
 				u,d = steer_control(m,b,d_ref)
-				depth = 0.7 # Profundidad del espacio para estacionarse [m]
+				if (abs(m)<=0.2) and (abs(d_ref-d)<=0.05):
+					self.stop_rs = True
+				if (self.stop_rs == True):
+					print('STOP RANSAC')
+					u = 0.0
+				else: u,self.d = steer_control(m,b,d_ref)
+
+				depth = 0.6 # Profundidad del espacio para estacionarse [m]
 				flag_space = lidar_roi_f(self.R,self.side, depth)
+				flag_space2 = lidar_roi_f2(self.R,self.side)
+				print(flag_space)
+				if (flag_space == False) and (self.car1==False):
+					self.car1 = True
+					self.stop_car_p()
+				if (self.car1== True) and (flag_space==True):
+					self.space_free = True
+					self.stop_car_p()
+				if (flag_space2 == True) and (self.space_free == True) and (self.car1==True):
+					#self.step = self.step+1
+					self.stop_car_p()
+					#self.step = self.step+1
+
+				#if (self.car1==True) and (self.space_free==True):
+				#flag_space2 = lidar_roi_f2(self.R,self.side)
+
+				#if (self.car1==True) and (flag_space==False) and (flag_space2==True):
+				#	self.stop_car_p()
+					#self.step = self.step+1
+
+
+				#if (self.car_roi==True) and (flag_space2 == True): self.step = self.step+1
+
+
+
+
+
+
+
+				"""
 				if (flag_space==True) and (abs(abs(d_ref)-abs(d))<=5.0): self.Pflag =True
 				if (self.Pflag== True): self.space_count = self.space_count+1
-				x_alin = (0.065)*(1.0/30.0)*self.space_count #0.065
-				print('Pflag ', self.Pflag)
+				x_alin = (0.05)*(1.0/30.0)*self.space_count #0.065
+				#print('Pflag ', self.Pflag)
 				if (self.Pflag==True) and (x_alin>=0.65):
-					self.FTY = False
-					self.step = self.step+1
-					self.delay_time(0.1)
+					v = 0
+					#self.FTY = False
+					#self.step = self.step+1
+					#self.delay_time(1.0)
+				"""
+
 
 			if (self.step == 1):
 				print('Inicio de la maniobra')
-				u = 1.0*k
-				v = -Nv #*0.85
-				if (abs(self.Dyaw)>=90.0) or (r180<=0.3): self.step = self.step + 1
+				u = 0.0 #1.0*k
+				v = 0.0 #-Nv*1.0
+				if (abs(self.Dyaw)>=90.0) or (r180<=0.3):
+					v = 0.0
+					self.step = self.step + 1
 
 			if (self.step == 2):
 				print('Fin de la maniobra')
@@ -448,7 +531,12 @@ class autominy(object):
 			steering_msg.value = u
 			self.Vpub.publish(speed_msg)
 			self.Spub.publish(steering_msg)
-
+#----------------------------------------------------------------------------------------------------------------
+#
+	def stop_car_p(self):
+		self.stop_car()
+		self.delay_time(1.0) #5.0
+		self.s_alto = 0
 #################################################################################################################
 #################################################################################################################
 #################################################################################################################

@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import cv2
+import time
 import rospy
 import numpy as np
 from bno055_usb_stick_msgs.msg import Output
@@ -54,8 +55,9 @@ class autominy(object):
 		#self.e_y_h = 0.0
 		#self.Ie_y = 0.0
 		# V. YOLO
-		self.v_max = 185 #145-275
+		self.v_max = 235 #185-275
 		self.s_carro = 0
+		self.s_alto = 0
 		#V. Behavior Control
 		self.s_rojo = 0
 		self.s_peat = 0
@@ -129,6 +131,7 @@ class autominy(object):
 		self.s_peat = 0
 		self.s_carro = 0
 		self.s_rojo = 0
+		self.s_alto = 0
 		id_class = data_yolo.bounding_boxes
 		for i in range(len(id_class)):
 			id_number = id_class[i].id
@@ -141,11 +144,13 @@ class autominy(object):
 			#if (id_number == 17) and (area>=2167): self.stop = True	# Sem Rojo
 			if (id_number == 13) and (area>=2000): self.v_max = 185		# lim 50km_h
 			if (id_number == 14) and (area>=2000): self.v_max = 235		# lim 100km_h
-			if (id_number == 8) and (area>=2450): self.s_rojo = 1		# Alto
+			if (id_number == 8) and (area>=1700): self.s_alto = 1		# Alto 
+			# v=225 => area = 2000
+			# v=235 => area = xxx
 			#if (id_number == 9) and (area>=2450): self.NoEst = True	# No estacionarse
 
 			# Objetos del camino
-			if (id_number == 4) and (area>=1750) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
+			if (id_number == 4) and (area>=1500) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
 			if (id_number == 0) and (area>=8500) and (220<=cx<=425) and (p>=0.85): self.s_carro = 1		# Carro
 
 		"""
@@ -218,19 +223,20 @@ class autominy(object):
 
 
 		# Maneuver selector
-		maneuver = 1 #2
-		self.side = -1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		if (self.s_alto==0):
+			maneuver = 2
+			self.side = 1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		if (self.s_alto==1):
+			maneuver = 5
 
 
 		if (maneuver==0):
 			print('---------ALTO TOTAL------------')
 			self.stop_car()
 		if (maneuver==1):
-			#print('--------SEGUIMIENTO DEL CARRIL-----------')
 			print('--------SEGUIMIENTO DEL CARRIL IZQUIERDO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==2):
-			#print('--------EVASION-----------')
 			print('--------SEGUIMIENTO DEL CARRIL DERECHO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==3):
@@ -239,6 +245,9 @@ class autominy(object):
 		if (maneuver==4):
 			print('-----------ESTACIONAMIENTO PPERPENDICULAR-----------')
 			self.perpendicular_parking()
+		if (maneuver==5):
+			print('------------ALTO PARCIAL---------')
+			self.stop_car_p()
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -448,7 +457,12 @@ class autominy(object):
 			steering_msg.value = u
 			self.Vpub.publish(speed_msg)
 			self.Spub.publish(steering_msg)
-
+#----------------------------------------------------------------------------------------------------------------
+#
+	def stop_car_p(self):
+		self.stop_car()
+		self.delay_time(5.0)
+		self.s_alto = 0
 #################################################################################################################
 #################################################################################################################
 #################################################################################################################

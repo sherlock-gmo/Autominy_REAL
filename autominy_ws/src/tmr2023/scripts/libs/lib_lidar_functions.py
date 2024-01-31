@@ -60,9 +60,33 @@ def lidar_roi_f(R,side,depth):
 		else:
 			lim_inf = -depth
 			lim_sup = -0.15
-		if (x>=-0.25) and (x<=0.15) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1
+		#if (x>=-0.25) and (x<=0.15) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_final_1_2_3.py
+		#if (x>=-0.1) and (x<=0.3) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_final_1_2_3_b.py
+		if (x>=-0.1) and (x<=0.4) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_final_1_2_3_c.py
 	if (count_side>=2): side_space = False
 	return side_space
+
+
+#****************************************************************************************************************
+def lidar_roi_f3(R,side,depth,x_p,x_n):
+        side_space = True
+        count_side = 0
+        i = 0
+        for r in R:
+                x = r*np.cos(i*(np.pi/180.0))
+                y = r*np.sin(i*(np.pi/180.0))
+                i = i+1
+                k = (-1)*side
+                if (side == -1):
+                        lim_inf = 0.15
+                        lim_sup = depth
+                else:
+                        lim_inf = -depth
+                        lim_sup = -0.15
+                if (x>=x_n) and (x<=x_p) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_fi1nal_1_2_3_c.py
+        if (count_side>=2): side_space = False
+        return side_space
+
 #********************************************************************************
 #********************************************************************************
 def lidar_ev(R):
@@ -128,7 +152,7 @@ def lidar4ransac(R,ymax,ymin,side):
 		else:
 			lim_inf = -ymax
 			lim_sup = -ymin
-		if (x>=-1.5) and (x<=1.5) and (y>=lim_inf) and (y<=lim_sup): R_side.append(r)
+		if (x>=-2.5) and (x<=2.5) and (y>=lim_inf) and (y<=lim_sup): R_side.append(r)
 		else: R_side.append(3.0)
 	return R_side
 #********************************************************************************
@@ -173,7 +197,28 @@ def vis_lidar(m,b,R):
 
 
 
+#********************************************************************************
+#********************************************************************************
+def lidar_roi_f2(R,side):
+	side_space = True
+	count_side = 0
+	i = 0
+	for r in R:
+		x = r*np.cos(i*(np.pi/180.0))
+		y = r*np.sin(i*(np.pi/180.0))
+		i = i+1
+		k = (-1)*side
+		if (side == -1):
+			lim_inf = 0.15
+			lim_sup = 0.6
+		else:
+			lim_inf = -0.6
+			lim_sup = -0.15
+		#if (x>=-0.25) and (x<=0.25) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_final_1_2_3.py
+		if (x>=-0.1) and (x<=0.25) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1 #tmr2023_final_1_2_3_b.py
 
+	if (count_side>=2): side_space = False
+	return side_space
 
 
 

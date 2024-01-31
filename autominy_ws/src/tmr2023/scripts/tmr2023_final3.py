@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import cv2
+import time
 import rospy
 import numpy as np
 from bno055_usb_stick_msgs.msg import Output
@@ -16,6 +17,7 @@ sys.path.insert(1, path_libs)
 from lib_lanekeep_functions import tip, roi_zone, vec_create, line_detector #,vis_cam
 from lib_lidar_functions import lidar_roi_f, lidar4ransac, lidar_ev #,vis_lidar
 from lib_parking_functions import steer_control, fit_ransac
+from lib_yolo_functions import yolo_roi
 from lib_model_builder import get_KBW
 from lib_nn_maneuver import get_NNmaneuver
 _,_,B_d,W_d = get_KBW(path_libs+'/behavior_selector_weights.h5')
@@ -41,9 +43,9 @@ class autominy(object):
 		#V. Lidar
 		self.step = 0
 		self.R = np.zeros(360)
-		self.s_obj = False
+		self.s_obj = 0
 		#V. Camera
-		self.l = 30 #30 # Tamano de la recta con que se modela el camino
+		self.l = 60 #30 # Tamano de la recta con que se modela el camino
 		self.FT = 0
 		self.side = 1 #-1 # 1=Derecha -1=Izquierda
 		self.x_ref = 118 #I 85 #D 120
@@ -54,8 +56,9 @@ class autominy(object):
 		#self.e_y_h = 0.0
 		#self.Ie_y = 0.0
 		# V. YOLO
-		self.v_max = 185 #145-275
+		self.v_max = 250 #235 #185-275
 		self.s_carro = 0
+		self.s_alto = 0
 		#V. Behavior Control
 		self.s_rojo = 0
 		self.s_peat = 0
@@ -100,7 +103,7 @@ class autominy(object):
 #----------------------------------------------------------------------------------------------------------------
 #																	LIDAR
 	def callback_Lidar(self, data_lidar):
-		rmax = 1.5 # Distancia maxima de deteccion
+		rmax = 1.5 #1.5  # Distancia maxima de deteccion
 		i = 0
 		self.R = np.clip(data_lidar.ranges,0.08,rmax)
 		cam_post = [157,158,159,160,161,162,200,201,202,203,204]
@@ -110,18 +113,30 @@ class autominy(object):
 		R0 = np.concatenate((R0_i,R0_d),axis=None)
 		r0 = np.min(R0)
 		if (r0<=0.9): #0.9
-			self.s_obj = True
-		else: self.s_obj = False
+			self.s_obj = 1
+		else: self.s_obj = 0
 #----------------------------------------------------------------------------------------------------------------
 #																	CAMERA RGB
 	def callback_Cam(self,data_camera):
 		#____________________________Procesamiento de la imagen
 		imagen0 = bridge.imgmsg_to_cv2(data_camera, "bgr8") 	# Imagen cv2
+		
 		# Crea la mascara del color segmentado (anaranjado)
-		lower = np.array([100,95,125])	#RGB: 100,46,170 # BGR: 0,45,146
-		upper = np.array([140,255,255])	#RGB:140,255,255 # BGR: 11,255,255
+		#lower = np.array([100,95,125])	#RGB: 100,46,170 # BGR: 0,45,146
+		#upper = np.array([140,255,255])	#RGB:140,255,255 # BGR: 11,255,255
+		lower = np.array([0,0,200])
+		upper = np.array([179,10,255])
 		imagenS = cv2.inRange(cv2.cvtColor(imagen0,cv2.COLOR_BGR2HSV),lower,upper)
-		imagenS = cv2.medianBlur(imagenS,1)
+		imagenS = cv2.medianBlur(imagenS,7)
+		imagenS = cv2.Sobel(imagenS,cv2.CV_8U,1,0, ksize=13)
+		#imagenS = cv2.medianBlur(imagenS,7)
+
+
+		#imagenS = cv2.cvtColor(imagen0, cv2.COLOR_BGR2GRAY)		  		# Escala de grises
+		#_,imagenS = cv2.threshold(imagenS,180,255,cv2.THRESH_BINARY) # Binarizacion(solo para imagenes de un canal)
+
+
+
 		self.imagenF = tip(imagenS) 	# TIP
 #----------------------------------------------------------------------------------------------------------------
 #																	YOLO
@@ -129,6 +144,7 @@ class autominy(object):
 		self.s_peat = 0
 		self.s_carro = 0
 		self.s_rojo = 0
+		self.s_alto = 0
 		id_class = data_yolo.bounding_boxes
 		for i in range(len(id_class)):
 			id_number = id_class[i].id
@@ -139,39 +155,49 @@ class autominy(object):
 			# Senales de transito
 			#if (id_number == 15) and (area>=2167): self.stop = False 	# Sem Verde
 			#if (id_number == 17) and (area>=2167): self.stop = True	# Sem Rojo
-			if (id_number == 13) and (area>=2000): self.v_max = 185		# lim 50km_h
-			if (id_number == 14) and (area>=2000): self.v_max = 235		# lim 100km_h
-			if (id_number == 8) and (area>=2450): self.s_rojo = 1		# Alto
-			#if (id_number == 9) and (area>=2450): self.NoEst = True	# No estacionarse
+			if (id_number == 13) and (area>=1700): self.v_max = 185		# lim 50km_h
+			if (id_number == 14) and (area>=1700): self.v_max = 235		# lim 100km_h
+			if (id_number == 8) and (area>=10): self.s_alto = 1		# Alto
+			# v=225 => area = 2000
+			# v=235 => area = xxx
 
 			# Objetos del camino
-			if (id_number == 4) and (area>=1750) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
-			if (id_number == 0) and (area>=8500) and (220<=cx<=425) and (p>=0.85): self.s_carro = 1		# Carro
+			if (id_number == 4): # Peaton***
+				C = [60,350,251,125,420,120,585,350]
+				pt = yolo_roi(C, cx, cy)
+				if (area>=1500) and (pt==True): self.s_peat = 1
+			if (id_number == 0): # Carro***
+				C = [150,340,270,140,385,140,510,340]
+				kt = yolo_roi(C, cx, cy)
+				if (area>=6000) and (kt==True):
+					print('****************CARRO****************')
+					self.s_carro = 1
 
-		"""
-		id		class			area_min
-		----------------------------------------------
-		0		carro
-		1		camion
-		2		bicicleta
-		3		moto
-		4		peaton
-		5		perro
-		6		gato
-		7		caballo
-		8		alto
-		9		noest
-		10		20km
-		11		30km
-		12		40km
-		13		50km			2450
-		14		100km			1500
-		15		sem_verde
-		16		sem_amarillo
-		17		sem_rojo
-		18		sem_NA
-		19		tren
-		"""
+
+			"""
+			id		class			area_min
+			----------------------------------------------
+			0		carro
+			1		camion
+			2		bicicleta
+			3		moto
+			4		peaton
+			5		perro
+			6		gato
+			7		caballo
+			8		alto
+			9		noest
+			10		20km
+			11		30km
+			12		40km
+			13		50km			2450
+			14		100km			1500
+			15		sem_verde
+			16		sem_amarillo
+			17		sem_rojo
+			18		sem_NA
+			19		tren
+			"""
 
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -216,21 +242,55 @@ class autominy(object):
 		else: maneuver = 0
 		"""
 
-
+		"""
 		# Maneuver selector
-		maneuver = 1 #2
-		self.side = -1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		# Prueba 1
+		if (self.s_alto==0):
+			maneuver = 2
+			self.side = 1 #1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		if (self.s_alto==1):
+			maneuver = 5
+		"""
+		
+		# Pruebas 2 y 3
+		if (self.s_obj==1): #and (self.s_carro==1):
+			self.s_ev=1
+			self.FT = 0
+		if (self.s_ev==0):
+			maneuver = 2 # Derecha
+		else:
+			maneuver = 1 # Izquierda
+			self.space_count = self.space_count+1
+			#x_alin = (0.065)*(1.0/30.0)*self.space_count # v=185 => 0.065[m/s]
+			x_alin = (1.0/30.0)*self.space_count #0.00035
+			#x_alin = self.R[224]
+			r270 = self.R[269]
+			rmin = np.amin(self.R[224:314])
+			#for r in self.R[179:269]:
+			
+			if (x_alin>=17.5):
+				#if (x_alin>=12.5) and (r270>=0.4): #15.0
+				maneuver = 2
+				self.s_ev = 0
+				self.FT = 0
+				self.space_count = 0
 
+		
+		"""
+		# Prueba 4
+		maneuver = 4
+		self.side = 1
+
+		"""
+		if (self.s_peat==1): maneuver = 0
 
 		if (maneuver==0):
 			print('---------ALTO TOTAL------------')
 			self.stop_car()
 		if (maneuver==1):
-			#print('--------SEGUIMIENTO DEL CARRIL-----------')
 			print('--------SEGUIMIENTO DEL CARRIL IZQUIERDO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==2):
-			#print('--------EVASION-----------')
 			print('--------SEGUIMIENTO DEL CARRIL DERECHO-----------')
 			self.lane_keeping(maneuver)
 		if (maneuver==3):
@@ -239,6 +299,9 @@ class autominy(object):
 		if (maneuver==4):
 			print('-----------ESTACIONAMIENTO PPERPENDICULAR-----------')
 			self.perpendicular_parking()
+		if (maneuver==5):
+			print('------------ALTO PARCIAL---------')
+			self.stop_car_p()
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -259,24 +322,24 @@ class autominy(object):
 	def lane_keeping(self,maneuver):
 		if (maneuver==2):
 			# Derecha
-			self.v = self.v_max #175
+			self.v = 250 #self.v_max #265 #self.v_max #175
 			self.side = 1
-			self.x_ref = 118 #115
-			self.x_search = 180
+			self.x_ref = 120 #118
+			self.x_search = 190 #180
 			self.l = 30
 		if (maneuver==1):
 			# Izquierda
-			self.v = 175 #self.v_max
+			self.v = 250 #185
 			self.side = -1
-			self.x_ref = 82 #85
-			self.x_search = 20
+			self.x_ref = 85 #82
+			self.x_search = 10
 			self.l = 50
 
 		speed_msg.value = self.v
 		y1 = 0
 		y2 = 0
 		#________________________________________Busca la linea
-		if (self.FT<=10):
+		if (self.FT<=10): #10
 			#print('-----------INCORPORAMIENTO AL CARRIL-----------')
 			x1 = self.x_search
 			self.FT = self.FT+1
@@ -448,7 +511,13 @@ class autominy(object):
 			steering_msg.value = u
 			self.Vpub.publish(speed_msg)
 			self.Spub.publish(steering_msg)
-
+#----------------------------------------------------------------------------------------------------------------
+#
+	def stop_car_p(self):
+		self.stop_car()
+		self.delay_time(5.0)
+		self.s_alto = 0
+		self.v_max = 275
 #################################################################################################################
 #################################################################################################################
 #################################################################################################################

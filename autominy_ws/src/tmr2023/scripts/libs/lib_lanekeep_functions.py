@@ -8,7 +8,7 @@ import numpy as np
 #*************************************************************************************************************
 #  		               TIP
 def tip(imagenN):
-	H=np.array([[-5.21117569e-01,-1.83967176,2.60285911e+02],[-1.51068900e-01,-6.17346988,6.39624244e+02],[-4.53920413e-04,-1.83108320e-02,1.0]])
+	H=np.array([[-4.51935893e-01,-1.59213448,2.29943094e+02],[-1.49372457e-01,-5.42175253,6.00556357e+02],[-4.31688088e-04,-1.60028341e-02,1.0]])
 	imagenH = cv2.warpPerspective(imagenN, H, (200,300),borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
 	return imagenH
 #*************************************************************************************************************
@@ -16,27 +16,29 @@ def tip(imagenN):
 #*************************************************************************************************************
 def roi_zone(x):
 	assert (x>=0) and (x<=199), 'x out of limits'
-	if (x>118) and (x<=199):
-		y = int(round(-2.0998*x+546.6584))
-	if (x>=81) and (x<=118):
+	if (x>119) and (x<=199):
+		y = int(round(-1.975*x+534.025))
+	if (x>=80) and (x<=119):
 		y = 299
-	if (x>=0) and (x<81):
-		y = int(round(1.8765*x+147.0))
+	if (x>=0) and (x<80):
+		y = int(round(2.0*x+139.0))
 	return y
 #*************************************************************************************************************
 #*************************************************************************************************************
 #*************************************************************************************************************
 def vec_create(x,stride,side):
 	if(side==1):
+		# D
 		xi = x+stride
 		xd = x-stride
-	else:
+	if(side==-1): #else:
+		# I
 		xi = x-stride
 		xd = x+stride
 	if(xi<0): xi = 0
 	if(xi>199): xi = 199
-	if(xd<0): xi = 0
-	if(xd>199): xi = 199
+	if(xd<0): xd = 0 #xi
+	if(xd>199): xd = 199 #xi
 	xv = np.arange(xi,xd,(-1)*side)
 	return xv
 #*************************************************************************************************************
@@ -44,8 +46,8 @@ def vec_create(x,stride,side):
 #*************************************************************************************************************
 def line_detector(imagen0,x1,l,side):
 	K = True
-	stridex = 12
-	stridey = 12
+	stridex = 30 #25 #12
+	stridey = 25 #25 #12
 	y1 = roi_zone(x1)
 	x1v = vec_create(x1,stridex,side)
 	while (K==True):
@@ -58,11 +60,12 @@ def line_detector(imagen0,x1,l,side):
 					y1 = j
 					K = False
 					break
-			x1v = vec_create(x1,stridex,side)
+			#x1v = vec_create(x1,stridex,side)
 			if (K==False): break
 		if (K==True):
 			x1 = x1-1*side
 			y1 = roi_zone(x1)
+			x1v = vec_create(x1,stridex,side)
 	x2 = x1
 	x2v = vec_create(x2,stridex,side)
 	for j in range(y1-1,y1-l,-1):
@@ -70,7 +73,7 @@ def line_detector(imagen0,x1,l,side):
 			if imagen0[j][i]==255:
 				x2 = i
 				y2 = j
-				K = False
+				#K = False
 				break
 		x2v = vec_create(x2,stridex,side)
 	return x1,y1,x2,y2
