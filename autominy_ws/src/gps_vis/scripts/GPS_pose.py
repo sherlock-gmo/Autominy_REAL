@@ -18,10 +18,10 @@ dist_coef = np.array([[-3.34720632e-01,1.18125580e-01,4.17257777e-04,-1.61458599
 # Green
 lower_g = np.array([60,50,50])
 upper_g = np.array([80,255,255])
-# Orange
-lower_o = np.array([60,50,50])
-upper_o = np.array([80,255,255])
-path = '/home/sherlock/cinvespuma_ws/src/gps_vis/scripts/'
+# Magenta
+lower_m = np.array([159,175,67])
+upper_m = np.array([179,255,255])
+path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
 
 #**********************************************************************************
 #**********************************************************************************
@@ -37,23 +37,23 @@ def video_cap():
 	imagenF = cv2.remap(imagen0,mapx,mapy,cv2.INTER_LINEAR)
 	imagenF = cv2.warpPerspective(imagenF, H, (300,300),borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0)) 
 	imagenF_g = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_g,upper_g) 
-	imagenF_o = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_o,upper_o) 
+	imagenF_m = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_m,upper_m) 
 	#imagenF = cv2.medianBlur(imagenF,3)
 	
 	# Calculo de la posicion
 	M_g = cv2.moments(imagenF_g)
-	M_o = cv2.moments(imagenF_o)
+	M_m = cv2.moments(imagenF_m)
 	#print(M_g["m00"])
 	#print(M_m["m00"])
 	if (M_g["m00"]>=17000) and (M_m["m00"]>=17000):
 		cX_g = int(M_g["m10"]/M_g["m00"])
 		cY_g = int(M_g["m01"]/M_g["m00"])
-		cX_o = int(M_o["m10"]/M_o["m00"])
-		cY_o = int(M_o["m01"]/M_o["m00"])
+		cX_m = int(M_m["m10"]/M_m["m00"])
+		cY_m = int(M_m["m01"]/M_m["m00"])
 		#t = time.time()
 		pose_msg.x = cX_g
 		pose_msg.y = cY_g
-		pose_msg.theta = np.arctan2(cY_g-cY_o,cX_g-cX_o)*(np.pi/180.0)
+		pose_msg.theta = np.arctan2(cY_g-cY_m,cX_g-cX_m)*(np.pi/180.0)
 		GPS_pub.publish(pose_msg)
 
 		"""
