@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
 
 bridge = CvBridge()
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(2)
 cap.set(3,640)	# Resolution y
 cap.set(4,480)	# Resolution x
 cap.set(cv.CAP_PROP_FPS,30)	# FPS

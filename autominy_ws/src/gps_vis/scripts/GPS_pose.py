@@ -7,21 +7,21 @@ from geometry_msgs.msg import Pose2D
 
 pose_msg = Pose2D()
 
-cap = cv2.VideoCapture(1) #1
-cap.set(3,1280)	# Resolution y
-cap.set(4,720)	# Resolution x
+cap = cv2.VideoCapture(2) #1
+cap.set(3,640)	# Resolution y
+cap.set(4,480)	# Resolution x
 cap.set(cv2.CAP_PROP_FPS,30)	# FPS
 
-H = np.array([[ 2.34695419e-01, -1.32684008e-01, -6.51538676e+01], [ 3.44425305e-03,  2.11796937e-01, -5.43928720e+00], [-4.85568704e-05, -1.12204468e-03,  1.00000000e+00]])
-K = np.array([[625.70905563,0.0,714.99743504],[0.0,623.30278949,397.75606526],[0.0,0.0,1.0]])
-dist_coef = np.array([[-3.34720632e-01,1.18125580e-01,4.17257777e-04,-1.61458599e-04,-1.85794482e-02]])
-# Green
-lower_g = np.array([60,50,50])
-upper_g = np.array([80,255,255])
+H = np.array([[6.91246827e-01,-1.30542721e-01,5.281514],[4.74494068e-02,5.83532054e-01,-5.80606686],[-2.17200977e-04,-3.64501231e-05,1.0]])
+K = np.array([[319.71415651,0.0,344.96615854], [0.0,317.26216773,261.53024149], [0.0,0.0,1.0]])
+dist_coef = np.array([[-0.3466721 ,  0.14940472, -0.00101803,  0.00506543, -0.03453036]])
+# Cian
+lower_1 = np.array([80,125,80])
+upper_1 = np.array([110,255,255])
 # Magenta
-lower_m = np.array([159,175,67])
-upper_m = np.array([179,255,255])
-path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
+lower_2 = np.array([140,150,100])
+upper_2 = np.array([179,255,255])
+path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/dotmex_final/ads/'
 
 #**********************************************************************************
 #**********************************************************************************
@@ -30,43 +30,49 @@ def video_cap():
 	# Procesamiento de la imagen
 	_,imagen0 = cap.read()	
 	h,w = imagen0.shape[:2]
-	f = 1.19
-	w = int(w*f)
-	h = int(h*f)
+	w = int(w*1.0)
+	h = int(h*1.45)
 	mapx,mapy = cv2.initUndistortRectifyMap(K,dist_coef,None,None,(w,h),5)
 	imagenF = cv2.remap(imagen0,mapx,mapy,cv2.INTER_LINEAR)
-	imagenF = cv2.warpPerspective(imagenF, H, (300,300),borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0)) 
-	imagenF_g = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_g,upper_g) 
-	imagenF_m = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_m,upper_m) 
-	#imagenF = cv2.medianBlur(imagenF,3)
+	imagenF = cv2.warpPerspective(imagenF, H, (370,395),borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0)) 
+	imagenF_1 = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_1,upper_1) 
+	imagenF_2 = cv2.inRange(cv2.cvtColor(imagenF,cv2.COLOR_BGR2HSV),lower_2,upper_2) 
+	imagenF_1 = cv2.medianBlur(imagenF_1,1)
+	imagenF_2 = cv2.medianBlur(imagenF_2,1)
 	
 	# Calculo de la posicion
-	M_g = cv2.moments(imagenF_g)
-	M_m = cv2.moments(imagenF_m)
-	#print(M_g["m00"])
-	#print(M_m["m00"])
-	if (M_g["m00"]>=17000) and (M_m["m00"]>=17000):
-		cX_g = int(M_g["m10"]/M_g["m00"])
-		cY_g = int(M_g["m01"]/M_g["m00"])
-		cX_m = int(M_m["m10"]/M_m["m00"])
-		cY_m = int(M_m["m01"]/M_m["m00"])
-		#t = time.time()
-		pose_msg.x = cX_g
-		pose_msg.y = cY_g
-		pose_msg.theta = np.arctan2(cY_g-cY_m,cX_g-cX_m)*(np.pi/180.0)
+	M_1 = cv2.moments(imagenF_1)
+	M_2 = cv2.moments(imagenF_2)
+	#print(M_1["m00"])
+	#print(M_2["m00"])
+	if (M_1["m00"]>=17000) and (M_2["m00"]>=17000):
+		cX_1 = int(M_1["m10"]/M_1["m00"])
+		cY_1 = int(M_1["m01"]/M_1["m00"])
+		cX_2 = int(M_2["m10"]/M_2["m00"])
+		cY_2 = int(M_2["m01"]/M_2["m00"])
+		t = time.time()
+		pose_msg.x = cX_2
+		pose_msg.y = cY_2
+		pose_msg.theta = np.arctan2(cY_1-cY_2,cX_1-cX_2)*(np.pi/180.0)
 		GPS_pub.publish(pose_msg)
-
-		"""
-		# Guarda los datos
-		f = open(path+'prueba_pose02.csv','a+')
-		f.write("%5.2f	%5.2f	%5.2f\n" %(t, cX, cY))
-		f.close()
-		"""
-
+	else:
+		cX_1 = 0
+		cY_1 = 0
+		cX_2 = 0
+		cY_2 = 0
+	"""
+	# Guarda los datos
+	t = time.time()
+	f = open(path+'pose15.csv','a+')
+	f.write("%5.6f	%5.6f	%5.6f	%5.6f\n" %(t, pose_msg.x, pose_msg.y, pose_msg.theta))
+	f.close()
+		
+	"""
  	#Visualizacion
-	imagenF = cv2.circle(imagenF, (cX,cY), 3, (0,0,255),-1)
+	imagenF = cv2.circle(imagenF, (cX_1,cY_1), 3, (255,0,255),-1)
+	imagenF = cv2.circle(imagenF, (cX_2,cY_2), 3, (255,0,0),-1)
 	cv2.imshow('homografia',imagenF)	
-	cv2.moveWindow("homografia", 400,20)
+	#cv2.moveWindow("homografia", 400,20)
 	cv2.waitKey(1)
 
 #**********************************************************************************
