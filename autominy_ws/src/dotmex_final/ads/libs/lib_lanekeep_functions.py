@@ -4,8 +4,6 @@ import rospy
 import numpy as np
 from sklearn.linear_model import RANSACRegressor, LinearRegression
 from sklearn.metrics import mean_squared_error
-#from sklearn.cluster import DBSCAN
-#from numpy import linalg as LA
 
 ransac = RANSACRegressor()
 #**********************************************************************************************************************************
@@ -21,31 +19,29 @@ class lane_keep_f():
 		self.K = np.array([[410.80239519,0.0,469.13953267],[0.0,412.74534584,258.91870387],[0.0,0.0,1.0]])
 		self.dist_coeffs = np.array([[-2.80892642e-01,7.20543846e-02,-1.77783135e-04,-9.27152558e-04,-7.49371778e-03]])
 		self.nK,_ = cv2.getOptimalNewCameraMatrix(self.K, self.dist_coeffs, (540,960), 1, (540,960))
-
 		# Crea la mascara del color segmentado (anaranjado)
-		self.lower = np.array([100,150,200])	#RGB: 100,46,170 # BGR: 0,45,146
-		self.upper = np.array([126,255,255])	#RGB:140,255,255 # BGR: 11,255,255
-
+		self.lower = np.array([0,180,180])	#RGB: 100,46,170 # BGR: 0,45,146
+		self.upper = np.array([20,255,255])	#RGB:140,255,255 # BGR: 11,255,255
 		# Recorte vertical de la imagen
-		self.y_cut = 270	
-
+		self.y_cut = 270
 		# Traslacion para recortar la imagen sin distorcion
-		self.x_tras = 198 
+		self.x_tras = 198
 		self.y_tras = 172
-
 		# Parametros iniciales para el detector
-		self.eps = 10.0
-		self.n0 = 20.0
-		self.alpha = 0.85
-
-		# Se porponen tres lineas iniciales:
-		mr = 0.0 
-		br = 170.0 
-		mc = 0.0 
-		bc = 130.0 
-		ml = 0.0 
-		bl = 90.0 
-		self.L = np.array([[mr, mc, ml],[br, bc, bl]])
+		self.eps = 15.0
+		self.n0 = 30.0
+		self.alpha = 0.85 #0.85
+		self.L = self.init_L()
+	#**********************************************************************************************************************************	
+	#**********************************************************************************************************************************
+	def init_L(self):
+		# Se porponen dos lineas iniciales:
+		mr = 0.0
+		br = 170.0
+		ml = 0.0
+		bl = 130.0
+		L = np.array([[mr, ml],[br, bl]])
+		return L
 	#**********************************************************************************************************************************	
 	#**********************************************************************************************************************************
 	def seg_img(self,imagen0,F):
@@ -58,26 +54,28 @@ class lane_keep_f():
 		return imagenSeg
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
-	def get_list(self,imagenSeg):
+	def get_list(self,imagenSeg,l):
 		# Encontrar las coordenadas de los pixeles blancos
-		list_px = cv2.findNonZero(imagenSeg)				
+		list_px = cv2.findNonZero(imagenSeg)
 		# Suma y_cut a la coordenada y para mantener el sistema coordenado correcto
-		list_px[:,:, 1] += self.y_cut #270 							
+		list_px[:,:, 1] += self.y_cut #270
 		list_px = list_px.astype(np.float32)
 		list_px = cv2.undistortPoints(list_px, self.K, self.dist_coeffs, R=None, P=self.nK)
-		# Traslacion necesaria para antener el sistema coordenado correcto
-		list_px[:,:, 0] -= self.x_tras #198						
-		list_px[:,:, 1] -= self.y_tras #172							
+		# Traslacion necesaria para mantener el sistema coordenado correcto
+		list_px[:,:, 0] -= self.x_tras #198
+		list_px[:,:, 1] -= self.y_tras #172
 		list_px = cv2.perspectiveTransform(list_px, self.H)
-		N,_,_ = list_px.shape	
+		# Toma los indices de los elementos cuya coordenada y esta entre 299 y 299-l
+		s = 299-l
+		d = np.where(list_px[:,:,1]>=s)[0]
+		list_px = list_px[d]
+		N,_,_ = list_px.shape
 		list_px = np.reshape(list_px,(N,2))
-		return list_px
+		return list_px,N
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def fit_ransac(self,coordenadas_lista):
 		# Convertir la lista de puntos en dos arrays separados para las coordenadas x e y
-		#x = np.array([punto[0] for punto in coordenadas_lista])
-		#y = np.array([punto[1] for punto in coordenadas_lista])
 		x = coordenadas_lista[:,1]
 		y = coordenadas_lista[:,0]
 		# Reshape para que los arrays tengan la forma adecuada para scikit-learn
@@ -87,28 +85,25 @@ class lane_keep_f():
 		ransac.fit(x, y)
 		# Obtener los inliers y outliers del modelo ajustado
 		inliers_mask = ransac.inlier_mask_
-		#outliers_mask = np.logical_not(inliers_mask)
 		# Obtener la pendiente y el termino independiente del modelo ajustado
 		m = ransac.estimator_.coef_[0][0]
 		b = ransac.estimator_.intercept_[0]
 		# Calcular el error cuadratico medio de los inliers
 		r = mean_squared_error(y[inliers_mask], ransac.predict(x[inliers_mask]))
-		# Imprimir los resultados
-		#print("m: ",m)
-		#print("b: ", b)
-		#print("Error cuadratico medio de los inliers: ", inliers_error)
 		return m,b,r
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def ball_finder(self,Z,eps):
-		M,_ = Z.shape  
+		# Toma la lista de puntos Z, agarra un punto p de forma aleatoria y crea una bola B
+		# de radio eps, centrada en p. Devuelve la bola, el punto p y la cantidad de elementos que tiene
+		M,_ = Z.shape
 		i = np.random.randint(0,M)
 		x = Z[i,0]
 		y = Z[i,1]
 		p = np.array([x,y])
 		d = np.linalg.norm(Z-p,axis=1)
 		# Toma los indices de los elementos que son menores a eps
-		d = np.where(d<eps)[0] 		
+		d = np.where(d<eps)[0]
 		B = Z[d]
 		n,_ = B.shape
 		return np.array(B), np.reshape(p,(1,2)), n
@@ -118,68 +113,147 @@ class lane_keep_f():
 		#l = 0
 		k = True
 		while (k==True):
+			# Crea una bola de radio eps, centrada en un punto p aleatorio
 			B, p, n = self.ball_finder(Z,eps)
-			if (n>=n0): 
+			# Si la bola tiene menos de n0 elementos, busca otro punto p
+			if (n>=n0):
 				# Se intercambian los indices para que X sea el eje de avance y Y el lateral
 				p = np.flip(p,axis=1)
 				Yb = np.reshape(B[:,0],(n,1))
 				Xb = np.reshape(B[:,1],(n,1))
+				# Se hace una regresion lineal con los puntos de la bola
 				reg = LinearRegression().fit(Xb,Yb)
 				#r = reg.score(Xb, Yb)
 				m = reg.coef_[0][0]
 				b = reg.intercept_[0]
 				k = False
-			#l = l+1
-		#print(r)
-		#print('repeat ',l)
-		return p, m, b#, r
+		return p, m, b
+	#**********************************************************************************************************************************
+	#**********************************************************************************************************************************
+	def parallel_crit(self,i,L):
+		# Verifica si las lineas detectadas son paralelas.
+		# Si no, modifica una de las lineas para que lo sean
+		j = 1-i		# si i=0 => j=1 || si i=1 => j=0
+		#th1 = np.arctan(L[0,i])
+		#th2 = np.arctan(L[0,j])
+		#M = abs(th1-th2)
+		B = abs(L[1,i]-L[1,j]) # Separacion de las lineas
+		# No son paralelas si forman un angulo de 40deg o estan separadas 32+-15 cm
+		if (abs(B)<30.0): # or (M>0.35):
+			L[0,j] = L[0,i]
+			L[1,j] = L[1,i]+32*(2*i-1)
+		return L
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def act_line(self,L,p,m,b,alpha):
+		# Las lineas que se esperan obtener son 3 y sus parametros se guardan en una matriz L
+		# L = np.array([[mr, mc, ml],[br, bc, bl]])
+		# Esta funcion actualiza los elementos de L en funcion de los parametros m y b que se obtuvieron
+		# de la regresion lineal de la bola
 		x = p[0][0]
 		y = p[0][1]
-		d = np.absolute(y-L[0,:]*x-L[1,:])/np.sqrt(1.0+L[0,:]**2)
-		i = np.argmin(d)
-		L[0,i] = L[0,i]+alpha*(m-L[0,i]) 
-		L[1,i] = L[1,i]+alpha*(b-L[1,i]) 
+		# Se calcula la distancia entre el punto p y las rectas definidas por L
+		dr = abs(y-L[0,0]*x-L[1,0])/np.sqrt(1.0+L[0,0]**2)
+		dl = abs(y-L[0,1]*x-L[1,1])/np.sqrt(1.0+L[0,1]**2)
+		#dr = np.sqrt((m-L[0,0])**2+(b-L[1,0])**2)
+		#dl = np.sqrt((m-L[0,1])**2+(b-L[1,1])**2)
+		# Se actualiza solo la columna con menor distancia
+		i = np.argmin([dr,dl])
+		#if (min(dr,dl)<15.0):
+			# Regla de actualizacion con parametro de aprendizaje alfa (Regla delta)
+		L[0,i] = L[0,i]+alpha*(m-L[0,i])
+		L[1,i] = L[1,i]+alpha*(b-L[1,i])
+		# Verifica si son paralelas
+		#L = self.parallel_crit(i,L)
+		# Verifica que la matriz L esta ordenada de manera correcta,
+		# es decir, si la primera columna es la linea de la derecha
+		yr = L[0,0]*299.0+L[1,0]
+		yl = L[0,1]*299.0+L[1,1]
+		if (yr<yl): L[:,[0,1]]=L[:,[1,0]]
 		return L
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def get_lines(self,P,L,eps):
-		# Selecciona los puntos dependiendo de su cercania con las lineas de la iteracion anterior
-		i_r = np.argmin(L[1,:])
-		i_l = np.argmax(L[1,:])
-		i_c = 3-i_r-i_l
+		# Selecciona los puntos de P dependiendo de su cercania con las lineas de L de la iteracion anterior
+		# L = np.array([[mr, mc, ml],[br, bc, bl]])
+		# P es la lista de pixeles
+		# eps es la distancia de tolerancia en [cm]
+		# Obtiene el indice de las lineas derecha e izquierda
+		i_l = 1 #np.argmin(L[1,:])
+		i_r = 0 #np.argmax(L[1,:])
 
-		# DERECHA		
-		d_r = np.absolute(P[:,0]-L[0,i_r]*P[:,1]-L[1,i_r])/np.sqrt(1.0+L[0,i_r]**2)	# Calcula la distancia de tolerancia
-		d_r = np.where(d_r<eps)[0]															# Toma los indices de los elementos que son menores a eps
+		#______________________DERECHA______________________
+		# Calcula la distancia entre los puntos de P y la linea Lr(mr,br)
+		d_r = np.absolute(P[:,0]-L[0,i_r]*P[:,1]-L[1,i_r])/np.sqrt(1.0+L[0,i_r]**2)
+		# Toma los indices de los puntos mas cercanos a Lr (distancias menores a eps)
+		d_r = np.where(d_r<eps)[0]
 		L_r = P[d_r]
-		m_r,b_r,R_r = self.fit_ransac(L_r)											# Hace un ajuste tipo RANSAC
-		# CENTRAL
-		d_c = np.absolute(P[:,0]-L[0,i_c]*P[:,1]-L[1,i_c])/np.sqrt(1.0+L[0,i_c]**2)	# Calcula la distancia de tolerancia
-		d_c = np.where(d_c<eps)[0]															# Toma los indices de los elementos que son menores a eps
-		L_c = P[d_c]
-		m_c,b_c,R_c = self.fit_ransac(L_c)											# Hace un ajuste tipo RANSAC
-		# IZQUIERDA
-		d_l = np.absolute(P[:,0]-L[0,i_l]*P[:,1]-L[1,i_l])/np.sqrt(1.0+L[0,i_l]**2)	# Calcula la distancia de tolerancia
-		d_l = np.where(d_l<eps)[0]															# Toma los indices de los elementos que son menores a eps
+		# Hace un ajuste tipo RANSAC
+		if L_r is not None: m_r,b_r,R_r = self.fit_ransac(L_r)
+		else:
+			m_r = L[0,0]
+			b_r = L[1,0]
+			R_r = 10.0
+		#______________________IZQUIERDA______________________
+		# Calcula la distancia entre los puntos de P y la linea Ll(ml,bl)
+		d_l = np.absolute(P[:,0]-L[0,i_l]*P[:,1]-L[1,i_l])/np.sqrt(1.0+L[0,i_l]**2)
+		# Toma los indices de los puntos mas cercanos a Ll (distancias menores a eps)
+		d_l = np.where(d_l<eps)[0]
 		L_l = P[d_l]
-		m_l,b_l,R_l = self.fit_ransac(L_l)											# Hace un ajuste tipo RANSAC
+		# Hace un ajuste tipo RANSAC
+		if L_l is not None: m_l,b_l,R_l = self.fit_ransac(L_l)
+		else:
+			m_l = L[0,1]
+			b_l = L[1,1]
+			R_l = 10.0
+		# Crea la matriz L de salida
+		L_ransac = np.array([[m_r, m_l],[b_r, b_l]])
 
-		L_ransac = np.array([[m_r, m_c, m_l],[b_r, b_c, b_l]])
-		R = np.array([[R_r,R_c,R_l]])
-		return	L_ransac, R
+		# Verifica si no se han juntado las lineas por un error
+		if (abs(b_r-b_l)<15.0):
+			i = np.argmin(np.array([R_r,R_l]))
+			L_ransac = self.parallel_crit(i,L_ransac)
+
+		# Verifica que la matriz L esta ordenada de manera correcta,
+		# es decir, si la primera columna es la linea de la derecha
+		yr = L_ransac[0,0]*299.0+L_ransac[1,0]
+		yl = L_ransac[0,1]*299.0+L_ransac[1,1]
+		if (yr<yl): L_ransac[:,[0,1]]=L_ransac[:,[1,0]]
+		return	L_ransac
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
-	def line_class_FT(self,K,list_px):
-		# Se entrena el clasificador de datos durante K iteraciones 
-		for k in range (0,K): 
+	def line_class_FT(self,K,list_px,L):
+		# Se entrena el clasificador de datos durante K iteraciones
+		for k in range (0,K):
 			#	Se busca un punto de forma aleatoria y se hace una regresion lineal con sus vecinos
 			p, m, b = self.min_line(list_px,self.eps,self.n0)
-			# Se actualizan el clasificador de lineas
-			self.L = LKF.act_line(self.L,p,m,b,self.alpha)
-	return self.L
+			# Se actualiza el clasificador de lineas
+			L = self.act_line(L,p,m,b,self.alpha)
+		return L
+	#**********************************************************************************************************************************
+	#**********************************************************************************************************************************
+	def vis_lines(self,list_px,L,l):
+		# VISUALIZACION
+		x1r = 299-l
+		x2r = 299
+		y1r = int(round(x1r*L[0,0]+L[1,0]))
+		y2r = int(round(x2r*L[0,0]+L[1,0]))
+		x1l = 299-l
+		x2l = 299
+		y1l = int(round(x1l*L[0,1]+L[1,1]))
+		y2l = int(round(x2l*L[0,1]+L[1,1]))
+		imagenH = np.zeros((300,300,3))
+		for x,y in list_px: imagenH = cv2.circle(imagenH, (int(x), int(y)), 2, (0, 255, 0), -1)
+		imagenH =cv2.line(imagenH, (y1r,x1r),(y2r,x2r), (0,0,255), 3)
+		imagenH =cv2.line(imagenH, (y1l,x1l),(y2l,x2l), (255,0,0), 3)
+		cv2.imshow('test',imagenH)
+		cv2.waitKey(1)
+	#**********************************************************************************************************************************
+	#**********************************************************************************************************************************
+
+
+
+
 
 
 

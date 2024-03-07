@@ -14,17 +14,10 @@ class parking_f():
 		pass
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
-	def fit_ransac(self,R,rmax):
-		L = len(R)
-		X = []
-		Y = []
-		for i in range (0,L):
-			if (R[i]<rmax) and (R[i]>0.0):
-				r = R[i]*100.0 # Convierte de [m] a [cm]
-				th = i*(np.pi/180.0)
-				X.append(r*np.cos(th))
-				Y.append(r*np.sin(th))
+	def fit_ransac(self,X,Y):
+		# Toma los puntos en [cm] y les hace una regresion lineal con RANSAC
 		L = len(X)
+		#print(L)
 		X = np.reshape(np.array(X),(L,1))
 		Y = np.reshape(np.array(Y),(L,1))
 		reg = ransac.fit(X,Y)
@@ -38,8 +31,8 @@ class parking_f():
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
 	def steer_control(self,m,b,d_ref):
-		Ky = -0.2
-		Kth = -9.2
+		Ky = -0.2 #-0.2
+		Kth = -9.2 #-9.2
 		d = b/np.sqrt(m**2+1)
 		e_y = d_ref-d
 		e_th = -np.arctan(m)
@@ -47,18 +40,42 @@ class parking_f():
 		return(u,d)
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
-
-
-
-	def measure_D(self,r_min,th_min):
-		if (th_min<4.7124): D_est = 2*r_min*np.sin(4.7124-th_min)
-		else: D_est = 0.0
-		return D_est
-
-
-
+	def parking_type(self,R,side,depth1,depth2):
+		# Toma los puntos del lidar en forma cartesiana y detecta si hay espacio para estacionarse
+		# Dependiendo de las dimensiones del espacio hace un estacionamiento en paralelo o perpedicular
+		p_type = 0
+		c1 = 0
+		c2 = 0
+		i = 0
+		for r in R:
+			x = r*np.cos(i*(np.pi/180.0))
+			y = r*np.sin(i*(np.pi/180.0))
+			i = i+1
+			if (side == -1):
+				lim_inf1 = 0.1
+				lim_sup1 = depth1 # 0.45
+				lim_inf2 = 0.1
+				lim_sup2 = depth2 # 0.55
+			else:
+				lim_inf1 = -depth1
+				lim_sup1 = -0.1
+				lim_inf2 = -depth2
+				lim_sup2 = -0.1
+			# Paralelo
+			if (x>=-0.3) and (x<=0.2) and (y>=lim_inf1) and (y<=lim_sup1): c1 = c1+1
+			#Perpendicular
+			if (x>=-0.2) and (x<=0.1) and (y>=lim_inf2) and (y<=lim_sup2): c2 = c2+1
+		if (c1==0): p_type = 1
+		if (c2==0) and (c1>0): p_type = 2
+		return p_type
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
+
+
+
+
+
+
 
 
 

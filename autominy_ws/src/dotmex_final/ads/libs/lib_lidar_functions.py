@@ -14,7 +14,8 @@ class lidar_f():
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
 	def polar_roi(self,R):
-		# Toma los puntos en forma polar y devuelve las distancias que hay entre el lidar y un objeto enfrente/detras
+		# Toma los puntos en forma polar y devuelve las distancias que hay entre el lidar 
+		#	y un objeto enfrente/detras
 		R0_i = R[0:29]
 		R0_d = R[329:359]
 		R0 = np.concatenate((R0_i,R0_d))
@@ -23,8 +24,9 @@ class lidar_f():
 		return r0, r180
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
-	def lidar4ransac(self,R,ymax,ymin,side):
-		# Toma los puntos en forma cartesiana y guarda en una lista aquellos que estan en una caja al costado del coche
+	def lidar4ransac_FT(self,R,ymax,ymin,side):
+		# Toma los puntos en forma cartesiana y guarda en una lista aquellos que estan 
+		#	en una caja al costado del coche
 		if (side == -1):
 			lim_inf = ymin
 			lim_sup = ymax
@@ -32,54 +34,47 @@ class lidar_f():
 			lim_inf = -ymax
 			lim_sup = -ymin
 		i = 0
-		R_side = []
+		X_side = []
+		Y_side = []
 		for r in R:
 			x = r*np.cos(i*(np.pi/180.0))
 			y = r*np.sin(i*(np.pi/180.0))
 			i = i+1
-			if (x>=-1.5) and (x<=1.5) and (y>=lim_inf) and (y<=lim_sup): R_side.append(r)
-			else: R_side.append(3.0)
-		return R_side
+			if (x>=-1.0) and (x<=1.0) and (y>=lim_inf) and (y<=lim_sup):
+				X_side.append(100.0*x) # Convierte a [cm]
+				Y_side.append(100.0*y)
+		return X_side, Y_side
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
-	def roi_flags(self,R,side,depth):
-		# Toma los puntos en forma cartesiana y detecta si hay espacio para estacionarse
-		side_space = True
-		count_side = 0
+	def lidar4ransac(self,R,L,eps):
+	# Toma los puntos en forma cartesiana y guarda aquellos que estan cerca de la linea detectada 
+	# en la iteracion anterior
+		m = L[0]
+		b = L[1]
 		i = 0
+		X = []
+		Y = []
 		for r in R:
-			x = r*np.cos(i*(np.pi/180.0))
-			y = r*np.sin(i*(np.pi/180.0))
+			x = 100.0*r*np.cos(i*(np.pi/180.0)) # Convierte a [cm]
+			y = 100.0*r*np.sin(i*(np.pi/180.0))
 			i = i+1
-			k = (-1)*side
-			if (side == -1):
-				lim_inf = 0.15
-				lim_sup = depth
-			else:
-				lim_inf = -depth
-				lim_sup = -0.15
-			if (x>=-0.25) and (x<=0.15) and (y>=lim_inf) and (y<=lim_sup): count_side = count_side+1
-		if (count_side>=2): side_space = False
-		return side_space
+			d = abs(y-m*x-b)/np.sqrt(1+m**2)
+			if (d<=eps):
+				X.append(x)
+				Y.append(y)
+		return X, Y
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
-
-
-
-	def lidar_ev(self,R):
-		cont1 = 0
-		cont2 = 0
-		for i in range(0,155):
-			r = R[i]
-			if (135<i<155) and (0.35<=r<=0.55): cont1 = cont1+1
-			if (0<i<=135) and (r<0.35): cont2 = cont2+1
-		if (cont1>=10) and (cont2==0): end_ev = True
-		else: end_ev = False
-		return end_ev
-
-
-
-
+	def lidar_obj(self,R):
+		# Toma los puntos en forma polar y detecta si hay un obstaculo enfrente
+		R0_i = R[0:12]
+		R0_d = R[359:347]
+		R0 = np.concatenate((R0_i,R0_d),axis=None)
+		r0 = np.min(R0)
+		if (r0<=0.9): #0.9
+			obj = True
+		else: obj = False
+		return obj
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
 	def vis_lidar(self,m,b,R):
@@ -115,6 +110,9 @@ class lidar_f():
 		cv2.waitKey(1)
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
+
+
+
 
 
 
