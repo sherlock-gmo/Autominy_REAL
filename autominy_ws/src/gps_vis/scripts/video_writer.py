@@ -7,7 +7,8 @@ video = cv2.VideoCapture(2)
 
 video.set(3,640)	# Resolution y
 video.set(4,480)	# Resolution x
-#video.set(cv2.CAP_PROP_FPS,30)	# FPS   
+video.set(cv2.CAP_PROP_SATURATION,0.75)	# Saturacion
+video.set(cv2.CAP_PROP_FPS,30)	# FPS  
 
 
 # We need to check if camera 
