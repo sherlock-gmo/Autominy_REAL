@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 import roslib
 import numpy as np
@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CompressedImage
 
 bridge = CvBridge()
-cap = cv.VideoCapture(2)
+cap = cv.VideoCapture(0)
 cap.set(3,640)	# Resolution y
 cap.set(4,480)	# Resolution x
 cap.set(cv.CAP_PROP_FPS,30)	# FPS
@@ -30,7 +30,7 @@ imagenC_msg.format = "jpeg"
 def video_cap():
 	_,imagen0 = cap.read()	    							  # Original
 	imagen0_msg = bridge.cv2_to_imgmsg(imagen0,"bgr8") #,"bgr8"
-	imagenC_msg.data = np.array(cv.imencode('.jpg', imagen0)[1]).tostring()
+	imagenC_msg.data = np.array(cv.imencode('.jpg', imagen0)[1]).tobytes()
 	Im_pub.publish(imagen0_msg)			#Publica el mensaje de imagen en Image_topic
 	ImC_pub.publish(imagenC_msg)		#Publica el mensaje de imagen en Image_topic
 	#rate.sleep()
@@ -38,12 +38,12 @@ def video_cap():
 #						PRINCIPAL
 #====================================================================
 if __name__ == '__main__':
-    try:
-			print("*** Nodo inicializado ***")
-			rospy.init_node('ELP_camera', anonymous=True)				# Nombre del nodo
-			Im_pub = rospy.Publisher('/sensors/camera/gps_vis/image_raw', Image, queue_size=5)	
-			ImC_pub = rospy.Publisher('/sensors/camera/gps_vis/image_raw/compressed', CompressedImage, queue_size=5)
-			while not rospy.is_shutdown():			# Ejecuta el bucle mientras no se presiona ctrl+C
-				video_cap()
-    except rospy.ROSInterruptException:
-        pass
+	try:
+		print('*** Nodo inicializado ***')
+		rospy.init_node('ELP_camera', anonymous=True)				# Nombre del nodo
+		Im_pub = rospy.Publisher('/sensors/camera/gps_vis/image_raw', Image, queue_size=5)	
+		ImC_pub = rospy.Publisher('/sensors/camera/gps_vis/image_raw/compressed', CompressedImage, queue_size=5)
+		while not rospy.is_shutdown():			# Ejecuta el bucle mientras no se presiona ctrl+C
+			video_cap()
+	except rospy.ROSInterruptException:
+		pass

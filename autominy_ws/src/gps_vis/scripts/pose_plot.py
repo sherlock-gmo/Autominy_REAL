@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
+#path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
+path = '/home/dotmex/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
 #**************************************************************************************************
 #**************************************************************************************************
 #**************************************************************************************************
@@ -22,7 +23,7 @@ def gen_vec(file_csv):
 #**************************************************************************************************
 #**************************************************************************************************
 #**************************************************************************************************
-file_gps_vis = 'pose_275_06.csv'
+file_gps_vis = 'pose_ev_275_01.csv'
 T,X,Y= gen_vec(file_gps_vis)
 plt.plot(X,Y,marker='.')
 plt.title('Pose 2D')

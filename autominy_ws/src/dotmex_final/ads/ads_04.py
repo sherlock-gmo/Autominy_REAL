@@ -11,7 +11,7 @@ from autominy_msgs.msg import Speed, SteeringAngle
 from autominy_msgs.msg import SpeedPWMCommand, NormalizedSteeringCommand
 from darknet_ros_msgs.msg import BoundingBoxes
 
-path_data = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/ads/Parking_data/'
+path_data = '/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/ads/evasion/275/'
 #path_libs = '/home/dotmex/dotMEX_Autominy_REAL/autominy_ws/src/tmr2023/scripts/libs'
 path_libs ='/home/ros/Autominy_REAL/autominy_ws/src/dotmex_final/ads/libs'
 import sys
@@ -23,8 +23,7 @@ LKF = lane_keep_f()
 LF = lidar_f()
 PF = parking_f()
 
-#from lib_lidar_functions import lidar_roi, lidar_side, lidar_ev
-#from lib_parking_functions import steer_control, fit_ransac
+
 from lib_model_builder import get_KBW
 from lib_nn_maneuver import get_NNmaneuver
 
@@ -46,27 +45,30 @@ class autominy(object):
 		self.FTY = True
 		self.yaw0 = 0.0
 		self.Dyaw = 0.0
-		self.D = 40.0 #38.0 #38.0 #34.0
-		
+		self.D = 40.0 #38.0 #34.0
 		#V. Lidar
 		self.R = np.zeros(360)
-		self.s_obj = False
-
+		self.s_obj_f = False
+		self.s_obj_b = False
+		# V. Parking
+		self.step = 0
+		self.Parflag = False
+		self.Perflag = False
+		self.FTP = 0
+		self.line_parking = [0.0, 0.0]
+		self.c = 0
 
 		#V. Camera
 		self.FTC = 0
-		self.L = np.zeros((2,3))
-
 		self.l = 30 #30 # Tamano de la recta con que se modela el camino
-		self.side = 1 #-1 # 1=Derecha -1=Izquierda
-		self.x_ref = 85 #88 #120
-		self.x1_h = 85 #88 #120
-		self.x_search = 20 #160
 		self.imagenF = np.zeros((640,480))
-		self.v = 185 #145-275
-		#self.e_y_h = 0.0
-		#self.Ie_y = 0.0
 
+		#V. Lane-Keeping
+		self.y_ref = -15.0
+		self.side = 1 #-1 # 1=Derecha -1=Izquierda
+		self.v = 185 #145-275
+		self.M = 0.0
+		self.B = 0.0
 
 		# V. YOLO
 		self.v_max = 185 #145-275
@@ -78,17 +80,10 @@ class autominy(object):
 		self.s_est = 0
 		self.s_ev = 0
 
-		# V. Parking
-		self.step = 0
-		self.Pflag = False
-		self.space_count = 0
-		self.FTP = 0
-		self.line_parking = [0.0, 0.0]
 
-		# BAG
+
 		rospy.Subscriber("/sensors/speed",SteeringAngle,self.callback_sp)
 		rospy.Subscriber("/sensors/steering",Speed,self.callback_st)
-
 		rospy.Subscriber('/parking',Int16,self.callback_Park)
 		rospy.Subscriber('/sensors/bno055/output', Output, self.callback_Imu)
 		rospy.Subscriber('/sensors/rplidar/scan', LaserScan, self.callback_Lidar)
@@ -114,11 +109,12 @@ class autominy(object):
 		self.st_sensor = data2.value
 #----------------------------------------------------------------------------------------------------------------
 #																	Save BAG
-	def save_data(self,N,sp_ref,sp_sensor,st_ref,st_sensor):
+	def save_data(self,N,sp_ref,sp_sensor,st_ref,st_sensor,side):
 		t = time.time()
 		f = open(path_data+'sensors_bag_'+str(N)+'.csv','a+')
-		f.write("%5.6f	%5.6f	%5.6f	%5.6f	%5.6f\n" %(t,sp_ref,sp_sensor,st_ref,st_sensor))
+		f.write("%5.6f	%5.6f	%5.6f	%5.6f	%5.6f	%5.6f\n" %(t,sp_ref,sp_sensor,st_ref,st_sensor,side))
 		f.close()
+
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -126,7 +122,7 @@ class autominy(object):
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
-	def delay_time(self,delay):
+	def stop_time(self,delay):
 		speed_msg.value = 0
 		self.Vpub.publish(speed_msg)
 		time.sleep(delay)
@@ -134,7 +130,7 @@ class autominy(object):
 #																	Park Signal
 	def callback_Park(self, data_park):
 		self.s_est = data_park.data
-		print(self.s_est)
+		#print(self.s_est)
 #----------------------------------------------------------------------------------------------------------------
 #																	IMU
 	def callback_Imu(self, data_imu):
@@ -155,9 +151,7 @@ class autominy(object):
 		rmax = 1.5 # Distancia maxima de deteccion
 		i = 0
 		self.R = np.clip(data_lidar.ranges,0.08,rmax)				# Satura los datos obtenidos entre 0.08 y rmax [m]
-		#cam_post = [157,158,159,160,161,162,200,201,202,203,204]
-		#self.R.put(cam_post,rmax)	#Quita los postes
-		self.s_obj = LF.lidar_obj(self.R)
+		self.s_obj_f,self.s_obj_b = LF.lidar_obj(self.R)
 		"""
 		ev_f = lidar_ev(self.R)
 		#print('ev_f ',ev_f)
@@ -168,18 +162,33 @@ class autominy(object):
 #----------------------------------------------------------------------------------------------------------------
 #																	CAMERA RGB
 	def callback_Cam(self,data_camera):
-		#____________________________Procesamiento de la imagen
-		imagen0 = bridge.imgmsg_to_cv2(data_camera, "bgr8") 	# Imagen cv2
-		imagenSeg = LKF.seg_img(imagen0, True)	# Segmenta la imagen
+		#start_time = time.time()
+		#_Procesamiento de la imagen
+		imagen0 = bridge.imgmsg_to_cv2(data_camera, "rgb8") 	# Imagen cv2
+		# Recorta la imagen y la segmenta
+		imagenSeg = LKF.seg_img(imagen0, True)
 		# Obtiene los pixeles blancos, les quita la distorcion radial y tangencial; y aplica la homografia
-		list_px = LKF.get_list(imagenSeg) 
-		# Detecta las lineas de la derecha, central e izquierda
-		if (self.FTC==0):
-			self.L = LKF.line_class_FT(150,list_px,self.L)
-			self.FTC = self.FTC+1
+		list_px,N = LKF.get_list(imagenSeg,self.l)
+		if (N<50):
+			print('No hay camino!')
+			LKF.L = LKF.init_L()
+			self.FTC = 0
 		else:
-			self.L, R = LKF.get_lines(list_px,self.L,10.0)
+			# Detecta las lineas de la derecha e izquierda
+			if (self.FTC<=5):
+				LKF.L = LKF.line_class_FT(100,list_px,LKF.L)
+				self.FTC = self.FTC+1
+			else:
+				LKF.L = LKF.get_lines(list_px,LKF.L,30.0)
+		#yr = LKF.L[0,0]*299.0+LKF.L[1,0]
+		#yl = LKF.L[0,1]*299.0+LKF.L[1,1]
+		#print('yr ',yr)
+		#print('yl ',yl)
+		#print('***********')
 
+		# VISUALIZACION
+		#LKF.vis_lines(list_px,LKF.L,self.l)
+		#print('t = ', (time.time()-start_time))
 #----------------------------------------------------------------------------------------------------------------
 #																	YOLO
 	def callback_Yolo(self,data_yolo):
@@ -203,7 +212,7 @@ class autominy(object):
 
 			# Objetos del camino
 			if (id_number == 4) and (area>=1750) and (220<=cx<=450) and (150<=cy<=360): self.s_peat = 1	# Peaton
-			if (id_number == 0) and (area>=8500) and (220<=cx<=425) and (p>=0.85): self.s_carro = 1		# Carro
+			if (id_number == 0) and (area>=11200) and (430<=cx<=560) and (p>=0.7): self.s_carro = 1	# Carro
 			#print('p ',p)
 			#print('car ',self.s_carro)
 
@@ -275,10 +284,12 @@ class autominy(object):
 		else: maneuver = 0
 		"""
 
+		if (self.s_obj_f==True): self.side = -1
+		if (self.s_obj_b==True): self.side = 1
 
 		# Maneuver selector
-		maneuver = 5
-		self.side = 1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		maneuver = 2
+		#self.side = -1 #self.side = 1, DERECHA // self.side = -1, IZQUIERDA
 
 
 		if (maneuver==0):
@@ -287,23 +298,23 @@ class autominy(object):
 		if (maneuver==1):
 			print('---------ALTO TOTAL------------')
 			self.total_stop()
+
+
 		if (maneuver==2):
-			print('--------SEGUIMIENTO DEL CARRIL IZQUIERDO-----------')
-			#self.lane_keeping(maneuver)
+			print('--------SEGUIMIENTO DEL CARRIL-----------')
+			self.lane_keeping()
+		"""
 		if (maneuver==3):
 			print('--------SEGUIMIENTO DEL CARRIL DERECHO-----------')
 			#self.lane_keeping(maneuver)
 		if (maneuver==4):
 			print('--------REBASE-----------')
 			#self.lane_keeping(maneuver)
+		"""
 		if (maneuver==5):
-			print('-----------ESTACIONAMIENTO PARALELO-----------')
-			self.parallel_parking()
-		"""
-		if (maneuver==6):
-			print('-----------ESTACIONAMIENTO PERPENDICULAR-----------')
-			self.perpendicular_parking()
-		"""
+			print('-----------ESTACIONAMIENTO-----------')
+			self.parking()
+
 #******************************************************************************************************************
 #******************************************************************************************************************
 #******************************************************************************************************************
@@ -326,103 +337,123 @@ class autominy(object):
 			self.Spub.publish(steering_msg)
 #----------------------------------------------------------------------------------------------------------------
 #																	LANE KEEPING AND PASSING
-	def lane_keeping(self,maneuver):
-		if (maneuver==2):
-			self.v = 175
-			self.side = 1
-			self.x_ref = 118 #115
-			self.x_search = 180
-			self.l = 30
-		if (maneuver==1):
-			self.v = self.v_max
-			self.side = -1
-			self.x_ref = 82 #85
-			self.x_search = 20
-			self.l = 50
+	def lane_keeping(self):
+		#self.side = 1, DERECHA // self.side = -1, IZQUIERDA
+		if (self.side==1):
+			print('		DERECHO		')
+			i = 0
+			self.y_ref = 166.0 #-15.0
+		if (self.side==-1):
+			print('		IZQUIERDO		')
+			i = 1
+			self.y_ref = 133.0 #+15.0
 
-		speed_msg.value = self.v
-		y1 = 0
-		y2 = 0
-		#________________________________________Busca la linea
-		if (self.FT<=5):
-			#print('-----------INCORPORAMIENTO AL CARRIL-----------')
-			x1 = self.x_search
-			self.FT = self.FT+1
-		else: x1 = self.x1_h
-		# self.side = 1, DERECHA // self.side = -1, IZQUIERDA
-		x1,y1,x2,y2 = line_detector(self.imagenF,x1,self.l,self.side)
-		self.x1_h = x1
-		#x2_h = x2
-		#________________________________________Ley de Control
-		Ky =  0.45631688 #0.48340796
-		Kth = 0.5265962 #0.53838659
-		#KDy = 0.0
-		#KIy = 0.0
-		e_y = x1-self.x_ref
-		e_th = np.arctan2(x2-x1,self.l) #En radianes
+		# Ley de Control
+		Ky = 0.24948692316565374
+		Kpsi = 2.853095113181638
+		# V = 165-225
+		# R	Q11	Q22	Ky			Kpsi
+		# 1.0	0.0875	12.5	0.23591059897497782	2.7519665652471006	+++
+		# 1.0	0.09	13.75	0.23670416124963695	2.856979438018758	++++
+		# 1.0	0.1	13.75	0.24948692316565374	2.853095113181638	++++
 
-		#h = 1.0/30.0
-		#De_y = (e_y-self.e_y_h)/h
-		#self.Ie_y = self.Ie_y+h*e_y
+		# V = 235
+		# 1.0   0.1     13.75   0.24948692316565374     2.853095113181638	++++
 
-		steering_msg.value = np.arctan(-Ky*e_y-Kth*e_th)*(2.0/np.pi) #Normalizado
-		#self.e_y_h = e_y
-		#print(x1,y1)
-		#print(x2,y2)
+                # V = 250
+		#			0.2			2.65			+
+                # 1.0   0.1     13.75   0.24948692316565374     2.853095113181638       +
+		# 1.0	0.06	10.0	0.2000022159633122	2.526217286397629	++
+		# 1.0	0.06375	11.475	0.20327546928919757	2.669391213357197	+++
+
+                # V = 275
+		#			0.15			2.85			+
+                # 1.0   0.1     13.75   0.24948692316565374     2.853095113181638       +
+
+		m = LKF.L[0,i]
+		b = LKF.L[1,i]
+		#xh = 299.0-(self.l/2.0)
+		#yh = 149.0
+		#d = yh-m*xh-b/np.sqrt(m**2+1)
+
+		e_y = (m*299+b)-self.y_ref
+		e_psi = -np.arctan(m)
+		steering_msg.value = np.arctan(-Ky*e_y-Kpsi*e_psi)*(2.0/np.pi) #Normalizado
+		# Espera 5 iteraciones antes de moverse
+		if (self.FTC>4): speed_msg.value = 175 #self.v
+		else: speed_msg.value = 0
+
+
+                #yr = LKF.L[0,0]*299.0+LKF.L[1,0]
+                #yl = LKF.L[0,1]*299.0+LKF.L[1,1]
+                #print('yr ',yr)
+                #print('yl ',yl)
+
+
 		#print('steering ',steering_msg.value)
-		print('speed ',speed_msg.value)
+		#print('speed ',speed_msg.value)
+		#print('e_y ',e_y)
+		#print('y1 ',m*299.0+b)
+		#print(LKF.L)
+		#print('e_psi ',e_psi*(180.0/np.pi))
+		print('delta ',steering_msg.value)
 		print('*********************')
-		"""
-	 	#Visualizacion
-		#namedWindow("homografia");
-		imagenS = cv2.cvtColor(self.imagenF,cv2.COLOR_GRAY2BGR)
-		imagenS = cv2.circle(imagenS,(x1,y1),3,(0, 0, 255),-1)
-		imagenS = cv2.circle(imagenS,(x2,y2),3,(0, 0, 255),-1)
-		imagenS = cv2.line(imagenS, (x1,y1), (x2,y2), (0, 0, 255), 2)
-		cv2.imshow('homografia',imagenS)
-		cv2.moveWindow("homografia", 400,20)
-		cv2.waitKey(1)
-		"""
+
 		self.Vpub.publish(speed_msg)
 		self.Spub.publish(steering_msg)
+
+		# Guardado de datos
+                c = 10
+                #self.save_data(c,speed_msg.value,self.sp_sensor,steering_msg.value,self.st_sensor,self.side)
+
 #----------------------------------------------------------------------------------------------------------------
-#																PARALLEL PARKING
-	def parallel_parking(self):
-		Nv = 185 #185 #215
-		# Obtiene la distancia entre el lidar y un objeto enfrente/detras
-		r0, r180 = LF.polar_roi(self.R)
-		k = (-1)*self.side
+#																PERPENDICULAR PARKING
+	def perpendicular_parking(self,Nv,r180,k,u):
+		print('Maniobra perpendicular')
+
 
 		if (self.step == 0):
-			# Puntos del lidar usados para el ajuste lineal
-			if (self.FTP<=10):
-				# Ancho de la caja en [m]
-				ymax = 0.5
-				ymin = 0.1
-				Xs,Ys = LF.lidar4ransac_FT(self.R,ymax,ymin,self.side)
-				self.FTP = self.FTP+1
-			else: Xs,Ys = LF.lidar4ransac(self.R,self.line_parking,5.0)
-			m,b = PF.fit_ransac(Xs,Ys)
-			self.line_parking = [m, b]
-			# Control de la velocidad y el angulo de direccion
-			v = Nv
-			d_ref = 15.0*k #15.0 # Separacion en [cm]
-			u,d = PF.steer_control(m,b,d_ref)
-			# Deteccion del espacio suficiente
-			depth = 0.35 # Profundidad del espacio para estacionarse [m]
-			flag_space = LF.roi_flags(self.R,self.side, depth)
-			if (flag_space==True) and (abs(abs(d_ref)-abs(d))<=5.0): self.Pflag =True
 			# "Medicion" de la distancia para acomodarse
-			r_alin = self.R[219]
-
-			# Pasa al siguiente paso
-			if (self.Pflag==True) and (r_alin<=0.3):
+			x_alin = 0.12*self.c*(1.0/30.0)
+			self.c = self.c+1
+			if (x_alin>=0.65):
+				self.D = 100.0
 				self.FTY = False
 				self.step = self.step+1
-				self.delay_time(0.1)
+				self.stop_time(0.1)
 
 		if (self.step == 1):
-			print('Inicio de la maniobra')
+			u = 1.0*k
+			v = -Nv
+			if (abs(self.Dyaw)>=90.0): # or (r180<=0.3):
+				self.step = self.step + 2
+
+		if (self.step == 2):
+			u = 0.0
+			v = -Nv
+			if (r180<=0.39): self.step = self.step+1
+
+		if (self.step == 3):
+			print('Fin de la maniobra')
+			u = 0
+			v = 0
+
+		return u,v
+#----------------------------------------------------------------------------------------------------------------
+#																PARALLEL PARKING
+	def parallel_parking(self,Nv,r0,r180,k,u):
+		print('Maniobra en paralelo')
+
+		if (self.step == 0):
+			# "Medicion" de la distancia para acomodarse
+			r_alin = self.R[225]
+			if (r_alin<=0.3):
+				self.D = 40.0
+				self.FTY = False
+				self.step = self.step+1
+				self.stop_time(0.1)
+
+		if (self.step == 1):
 			u = 1.0*k
 			v = -Nv #*0.85
 			if (abs(self.Dyaw)>=self.D): self.step = self.step + 1
@@ -446,6 +477,46 @@ class autominy(object):
 				print('Fin de la maniobra')
 				u = 0
 				v = 0
+		return u,v
+#----------------------------------------------------------------------------------------------------------------
+#																PARKING
+	def parking(self):
+		u = 0.0
+		Nv = 185 #185
+		# Obtiene la distancia entre el lidar y un objeto enfrente/detras
+		r0, r180 = LF.polar_roi(self.R)
+		k = (-1)*self.side
+
+		if (self.step == 0):
+			# Puntos del lidar usados para el ajuste lineal
+			if (self.FTP<=30):
+				# Ancho de la caja en [m]
+				ymax = 0.6
+				ymin = 0.1
+				Xs,Ys = LF.lidar4ransac_FT(self.R,ymax,ymin,self.side)
+				self.FTP = self.FTP+1
+			else: Xs,Ys = LF.lidar4ransac(self.R,self.line_parking,5.0)
+			m,b = PF.fit_ransac(Xs,Ys)
+			self.line_parking = [m, b]
+			# Control de la velocidad y el angulo de direccion
+			v = Nv
+			d_ref = 17.0*k #15.0 # Separacion en [cm]
+			u,d = PF.steer_control(m,b,d_ref)
+
+			# Deteccion del espacio suficiente y el tipo de estacionamiento
+			depth1 = abs(d_ref/100.0)+0.3 # Profundidad del espacio para estacionarse en paralelo [m]
+			depth2 = abs(d_ref/100.0)+0.5 # Profundidad del espacio para estacionarse en perpendicular [m]
+			# 0=Ninguno // 1=Paralelo // 2=Perpendicular
+			parking_type = PF.parking_type(self.R,self.side,depth1,depth2)
+
+			if (parking_type==1) and (self.Perflag==False):
+				self.Parflag = True
+			if (parking_type==2) and (self.Parflag==False): 
+				self.Perflag = True
+
+		if (self.Parflag==True): u,v = self.parallel_parking(Nv,r0,r180,k,u)
+		if (self.Perflag==True): u,v = self.perpendicular_parking(Nv,r180,k,u)
+
 
 		# Visualizacion
 		#print('r0 ',r0)
@@ -454,7 +525,7 @@ class autominy(object):
 		#print('u ',u)
 		#print('v ',v)
 		print('****************************')
-		#vis_lidar(m,b,R)
+		#LF.vis_lidar(m,b,R)
 
 		speed_msg.value = v
 		steering_msg.value = u
@@ -462,15 +533,19 @@ class autominy(object):
 		self.Spub.publish(steering_msg)
 
 		# Guardado de datos
-		c = 15
+		c = 18
 		#self.save_data(c,speed_msg.value,self.sp_sensor,steering_msg.value,self.st_sensor)
+
 #################################################################################################################
 #################################################################################################################
 #################################################################################################################
 #								MAIN
 if __name__ == '__main__':
-	print("Nodo inicializado: TMR_2023.py")
-	rospy.init_node('tmr_2023',anonymous=True)
-	autominy()
-	rospy.spin()
+	try:
+		print("Nodo inicializado: Automated_Driven_System.py")
+		rospy.init_node('ads',anonymous=True)
+		autominy()
+		rospy.spin()
+	except rospy.ROSInterruptException:
+		pass
 

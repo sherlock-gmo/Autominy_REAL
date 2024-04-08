@@ -50,7 +50,7 @@ def img_callback(data):
 	global H,S,V,h,s,v,K
 	# Adquiere la imagen original
 	imagen0 = br.imgmsg_to_cv2(data,'bgr8')
-	imagen0 = cv2.resize(imagen0,(320,240),cv2.INTER_LINEAR)
+	#imagen0 = cv2.resize(imagen0,(320,240),cv2.INTER_LINEAR)
 	cv2.imshow('original',imagen0)
 	# Crea la mascara del color segmentado
 	upper = np.array([H,S,V])

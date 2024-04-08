@@ -3,7 +3,7 @@ $ catkin_make -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-8
 $ catkin_make
 
 En el autominy compilar con:
-$ catkin_make --only-pkg-with-deps dotmex2022 gps_vis autominy_msgs
+$ catkin_make --only-pkg-with-deps dotmex_final gps_vis autominy_msgs
 
 *Respecto al paquete darnet_ros:
 Solo hace falta descargar los pesos y pegarlos en la carpeta: /darknet_ros/yolo_network_config/weights/ 

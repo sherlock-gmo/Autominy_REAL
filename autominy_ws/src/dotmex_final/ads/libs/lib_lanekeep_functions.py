@@ -37,12 +37,12 @@ class lane_keep_f():
 	def init_L(self):
 		# Se porponen dos lineas iniciales:
 		mr = 0.0
-		br = 170.0
+		br = 180.0
 		ml = 0.0
-		bl = 130.0
+		bl = 120.0
 		L = np.array([[mr, ml],[br, bl]])
 		return L
-	#**********************************************************************************************************************************	
+	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def seg_img(self,imagen0,F):
 		K = 1
@@ -66,9 +66,10 @@ class lane_keep_f():
 		list_px[:,:, 1] -= self.y_tras #172
 		list_px = cv2.perspectiveTransform(list_px, self.H)
 		# Toma los indices de los elementos cuya coordenada y esta entre 299 y 299-l
-		s = 299-l
-		d = np.where(list_px[:,:,1]>=s)[0]
-		list_px = list_px[d]
+		cond1 = list_px[:,:,1]>=299-l
+		cond2 = list_px[:,:,1]<=299
+		COND = cond1 & cond2
+		list_px = list_px[COND[:,0],:,:]
 		N,_,_ = list_px.shape
 		list_px = np.reshape(list_px,(N,2))
 		return list_px,N
@@ -101,10 +102,10 @@ class lane_keep_f():
 		x = Z[i,0]
 		y = Z[i,1]
 		p = np.array([x,y])
-		d = np.linalg.norm(Z-p,axis=1)
+		d = np.linalg.norm(Z-p,2,axis=1)
 		# Toma los indices de los elementos que son menores a eps
-		d = np.where(d<eps)[0]
-		B = Z[d]
+		cond = d<=eps
+		B = Z[cond,:]
 		n,_ = B.shape
 		return np.array(B), np.reshape(p,(1,2)), n
 	#**********************************************************************************************************************************
@@ -137,16 +138,16 @@ class lane_keep_f():
 		#th1 = np.arctan(L[0,i])
 		#th2 = np.arctan(L[0,j])
 		#M = abs(th1-th2)
-		B = abs(L[1,i]-L[1,j]) # Separacion de las lineas
+		#B = abs(L[1,i]-L[1,j]) # Separacion de las lineas
 		# No son paralelas si forman un angulo de 40deg o estan separadas 32+-15 cm
-		if (abs(B)<30.0): # or (M>0.35):
-			L[0,j] = L[0,i]
-			L[1,j] = L[1,i]+32*(2*i-1)
+		#if (abs(B)<50.0): # or (M>0.35):
+		L[0,j] = L[0,i]
+		L[1,j] = L[1,i]+60.0*(2*i-1)
 		return L
 	#**********************************************************************************************************************************
 	#**********************************************************************************************************************************
 	def act_line(self,L,p,m,b,alpha):
-		# Las lineas que se esperan obtener son 3 y sus parametros se guardan en una matriz L
+		# Las lineas que se esperan obtener son 2 y sus parametros se guardan en una matriz L
 		# L = np.array([[mr, mc, ml],[br, bc, bl]])
 		# Esta funcion actualiza los elementos de L en funcion de los parametros m y b que se obtuvieron
 		# de la regresion lineal de la bola
@@ -181,43 +182,52 @@ class lane_keep_f():
 		# Obtiene el indice de las lineas derecha e izquierda
 		i_l = 1 #np.argmin(L[1,:])
 		i_r = 0 #np.argmax(L[1,:])
+		L_ransac = L
 
 		#______________________DERECHA______________________
 		# Calcula la distancia entre los puntos de P y la linea Lr(mr,br)
 		d_r = np.absolute(P[:,0]-L[0,i_r]*P[:,1]-L[1,i_r])/np.sqrt(1.0+L[0,i_r]**2)
 		# Toma los indices de los puntos mas cercanos a Lr (distancias menores a eps)
-		d_r = np.where(d_r<eps)[0]
-		L_r = P[d_r]
+		d_r = np.where(d_r<=eps)[0]
 		# Hace un ajuste tipo RANSAC
-		if L_r is not None: m_r,b_r,R_r = self.fit_ransac(L_r)
+		if (d_r.size>50):
+			m_r,b_r,R_r = self.fit_ransac(P[d_r])
+			L_ransac[:,0] = [m_r,b_r]
 		else:
-			m_r = L[0,0]
-			b_r = L[1,0]
-			R_r = 10.0
+			print('No se ve l. derecha')
+			R_r = 100.0
 		#______________________IZQUIERDA______________________
 		# Calcula la distancia entre los puntos de P y la linea Ll(ml,bl)
 		d_l = np.absolute(P[:,0]-L[0,i_l]*P[:,1]-L[1,i_l])/np.sqrt(1.0+L[0,i_l]**2)
 		# Toma los indices de los puntos mas cercanos a Ll (distancias menores a eps)
-		d_l = np.where(d_l<eps)[0]
-		L_l = P[d_l]
+		d_l = np.where(d_l<=eps)[0]
 		# Hace un ajuste tipo RANSAC
-		if L_l is not None: m_l,b_l,R_l = self.fit_ransac(L_l)
+		if (d_l.size>50):
+			m_l,b_l,R_l = self.fit_ransac(P[d_l])
+			L_ransac[:,1] = [m_l,b_l]
 		else:
-			m_l = L[0,1]
-			b_l = L[1,1]
-			R_l = 10.0
-		# Crea la matriz L de salida
-		L_ransac = np.array([[m_r, m_l],[b_r, b_l]])
+			print('No se ve l. izquierda')
+			R_l = 100.0
 
-		# Verifica si no se han juntado las lineas por un error
-		if (abs(b_r-b_l)<15.0):
-			i = np.argmin(np.array([R_r,R_l]))
-			L_ransac = self.parallel_crit(i,L_ransac)
-
-		# Verifica que la matriz L esta ordenada de manera correcta,
-		# es decir, si la primera columna es la linea de la derecha
+		# Si solo aparece una linea, crea una linea paralela a la que si existe
+		if (R_r>0.8 or R_l>0.8):
+                        i = np.argmin(np.array([R_r,R_l]))
+                        L_ransac = self.parallel_crit(i,L_ransac)
+		"""
+		print('R_r ',R_r)
+		print(d_r.size)
+		print('R_l ',R_l)
+		print(d_l.size)
+		print('*************************')
+		"""
 		yr = L_ransac[0,0]*299.0+L_ransac[1,0]
 		yl = L_ransac[0,1]*299.0+L_ransac[1,1]
+		# Verifica si no se han juntado las lineas por un error
+		if (abs(yr-yl)<50.0):
+			i = np.argmin(np.array([R_r,R_l]))
+			L_ransac = self.parallel_crit(i,L_ransac)
+		# Verifica que la matriz L esta ordenada de manera correcta,
+		# es decir, si la primera columna es la linea de la derecha
 		if (yr<yl): L_ransac[:,[0,1]]=L_ransac[:,[1,0]]
 		return	L_ransac
 	#**********************************************************************************************************************************
@@ -244,8 +254,8 @@ class lane_keep_f():
 		y2l = int(round(x2l*L[0,1]+L[1,1]))
 		imagenH = np.zeros((300,300,3))
 		for x,y in list_px: imagenH = cv2.circle(imagenH, (int(x), int(y)), 2, (0, 255, 0), -1)
-		imagenH =cv2.line(imagenH, (y1r,x1r),(y2r,x2r), (0,0,255), 3)
-		imagenH =cv2.line(imagenH, (y1l,x1l),(y2l,x2l), (255,0,0), 3)
+		imagenH =cv2.line(imagenH, (y1r,x1r),(y2r,x2r), (0,0,255), 2)
+		imagenH =cv2.line(imagenH, (y1l,x1l),(y2l,x2l), (255,0,0), 2)
 		cv2.imshow('test',imagenH)
 		cv2.waitKey(1)
 	#**********************************************************************************************************************************

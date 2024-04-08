@@ -7,25 +7,25 @@ from geometry_msgs.msg import Pose2D
 
 pose_msg = Pose2D()
 
-cap = cv2.VideoCapture(2) #1
+cap = cv2.VideoCapture(0) #1
 cap.set(3,640)	# Resolution y
 cap.set(4,480)	# Resolution x
-cap.set(cv2.CAP_PROP_SATURATION,0.75)	# Saturacion
+cap.set(cv2.CAP_PROP_SATURATION,-0.75)	# Saturacion
 cap.set(cv2.CAP_PROP_FPS,30)	# FPS
 
-H = np.array([[6.28530165e-01,-1.42690786e-01,1.65155265e+01],[8.31575514e-02,6.52108334e-01,-2.33679543e+01],[-1.83836281e-04,-4.41862005e-05,1.0]])
+H = np.array([[6.30238413e-01,-1.52026387e-01,2.11429691e+01],[9.07304807e-02,6.53824267e-01,-2.65866923e+01],[-1.94007022e-04,-2.92863954e-05,1.0]])
 K = np.array([[319.71415651,0.0,344.96615854], [0.0,317.26216773,261.53024149], [0.0,0.0,1.0]])
 dist_coef = np.array([[-0.3466721 ,  0.14940472, -0.00101803,  0.00506543, -0.03453036]])
 # Cian
-lower_1 = np.array([80,160,50])
-upper_1 = np.array([130,255,255])
+lower_1 = np.array([70,190,90])
+upper_1 = np.array([90,255,255])
 # Magenta
-lower_2 = np.array([150,100,60])
+lower_2 = np.array([115,165,100])
 upper_2 = np.array([179,255,255])
 
 Ker = 1
-path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
-
+#path = '/home/sherlock1804/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
+path = '/home/dotmex/Autominy_REAL/autominy_ws/src/gps_vis/scripts/'
 #**********************************************************************************
 #**********************************************************************************
 #**********************************************************************************
@@ -66,11 +66,10 @@ def video_cap():
 
 	# Guarda los datos
 	t = time.time()
-	f = open(path+'pose_275_06.csv','a+')
+	f = open(path+'pose_ev_275_11.csv','a+')
 	f.write("%5.6f	%5.6f	%5.6f	%5.6f\n" %(t, pose_msg.x, pose_msg.y, pose_msg.theta))
 	f.close()
 	"""
-
  	#Visualizacion
 	imagenF = cv2.circle(imagenF, (cX_1,cY_1), 3, (255,0,255),-1)
 	imagenF = cv2.circle(imagenF, (cX_2,cY_2), 3, (255,0,0),-1)
@@ -82,11 +81,11 @@ def video_cap():
 #**********************************************************************************
 #**********************************************************************************
 if __name__ == '__main__':
-    try:
-			print("*** Nodo inicializado, GPS_pose ***")
-			rospy.init_node('gps_pose', anonymous=True)	
-			GPS_pub = rospy.Publisher('pose_car', Pose2D, queue_size=8) 	
-			while not rospy.is_shutdown():	
-				video_cap()
-    except rospy.ROSInterruptException:
-        pass
+	try:
+		print("*** Nodo inicializado, GPS_pose ***")
+		rospy.init_node('gps_pose', anonymous=True)	
+		GPS_pub = rospy.Publisher('pose_car', Pose2D, queue_size=8) 	
+		while not rospy.is_shutdown():	
+			video_cap()
+	except rospy.ROSInterruptException:
+		pass

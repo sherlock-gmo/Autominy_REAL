@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-n = 0
+n = 4
 imagen0 = cv2.imread('0'+str(n)+'.png',1) # Origen (Imagen del suelo)
 #**************************************************
 #**************************************************

@@ -71,10 +71,16 @@ class lidar_f():
 		R0_d = R[359:347]
 		R0 = np.concatenate((R0_i,R0_d),axis=None)
 		r0 = np.min(R0)
-		if (r0<=0.9): #0.9
-			obj = True
-		else: obj = False
-		return obj
+		rb = np.min(R)
+		thb = np.argmin(R)
+
+		if (r0<=0.9): obj_f = True
+		else: obj_f = False
+
+		if (rb>=0.30) and (179<=thb<=205): obj_b = True
+		else: obj_b = False
+
+		return obj_f, obj_b
 #**********************************************************************************************************************************	
 #**********************************************************************************************************************************
 	def vis_lidar(self,m,b,R):
